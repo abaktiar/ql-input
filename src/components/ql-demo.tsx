@@ -1,17 +1,11 @@
 import { useState } from 'react';
-import { JQLInput } from './ui/jql-input';
+import { QLInput } from './ui/ql-input';
 import { Button } from './ui/button';
-import type {
-  JQLInputConfig,
-  JQLQuery,
-  JQLValue,
-  JQLField,
-  JQLFunction
-} from '@/lib/jql-types';
-import { toMongooseQuery, toSQLQuery, printExpression, countConditions } from '@/lib/jql-query-builder';
+import type { QLInputConfig, QLQuery, QLValue, QLField, QLFunction } from '@/lib/ql-types';
+import { toMongooseQuery, toSQLQuery, printExpression, countConditions } from '@/lib/ql-query-builder';
 
 // Sample configuration for demo
-const sampleFields: JQLField[] = [
+const sampleFields: QLField[] = [
   {
     name: 'project',
     displayName: 'Project',
@@ -116,7 +110,7 @@ const sampleFields: JQLField[] = [
   },
 ];
 
-const sampleFunctions: JQLFunction[] = [
+const sampleFunctions: QLFunction[] = [
   {
     name: 'currentUser',
     displayName: 'currentUser()',
@@ -149,7 +143,7 @@ const sampleFunctions: JQLFunction[] = [
   },
 ];
 
-const config: JQLInputConfig = {
+const config: QLInputConfig = {
   fields: sampleFields,
   functions: sampleFunctions,
   maxSuggestions: 10,
@@ -169,13 +163,13 @@ const sampleUsers = [
   { value: 'charlie.davis', displayValue: 'Charlie Davis', description: 'DevOps Engineer' },
 ];
 
-export function JQLDemo() {
+export function QLDemo() {
   const [query, setQuery] = useState('');
-  const [parsedQuery, setParsedQuery] = useState<JQLQuery | null>(null);
-  const [executedQuery, setExecutedQuery] = useState<JQLQuery | null>(null);
+  const [parsedQuery, setParsedQuery] = useState<QLQuery | null>(null);
+  const [executedQuery, setExecutedQuery] = useState<QLQuery | null>(null);
 
   // Mock async user suggestions
-  const getAsyncValueSuggestions = async (field: string, typedValue: string): Promise<JQLValue[]> => {
+  const getAsyncValueSuggestions = async (field: string, typedValue: string): Promise<QLValue[]> => {
     if (field === 'assignee' || field === 'reporter') {
       // Simulate API delay
       await new Promise((resolve) => setTimeout(resolve, 200));
@@ -189,12 +183,12 @@ export function JQLDemo() {
     return [];
   };
 
-  const handleQueryChange = (value: string, query: JQLQuery) => {
+  const handleQueryChange = (value: string, query: QLQuery) => {
     setQuery(value);
     setParsedQuery(query);
   };
 
-  const handleExecute = (query: JQLQuery) => {
+  const handleExecute = (query: QLQuery) => {
     setExecutedQuery(query);
   };
 
@@ -212,17 +206,16 @@ export function JQLDemo() {
   return (
     <div className='space-y-6'>
       <div>
-        <h2 className='text-2xl font-bold mb-4'>JQL Input Component Demo</h2>
+        <h2 className='text-2xl font-bold mb-4'>QL Input Component Demo</h2>
         <p className='text-muted-foreground mb-6'>
-          A comprehensive JQL (JIRA Query Language) input component with autocomplete, syntax highlighting, and
-          validation.
+          A comprehensive QL (Query Language) input component with autocomplete, syntax highlighting, and validation.
         </p>
       </div>
 
       <div className='space-y-4'>
         <div>
           <div className='flex items-center justify-between mb-2'>
-            <label className='text-sm font-medium'>JQL Query</label>
+            <label className='text-sm font-medium'>QL Query</label>
             {parsedQuery && (
               <div className='flex items-center gap-2 text-xs'>
                 <div
@@ -241,13 +234,13 @@ export function JQLDemo() {
               </div>
             )}
           </div>
-          <JQLInput
+          <QLInput
             value={query}
             onChange={handleQueryChange}
             onExecute={handleExecute}
             config={config}
             getAsyncValueSuggestions={getAsyncValueSuggestions}
-            placeholder='Enter your JQL query here...'
+            placeholder='Enter your QL query here...'
             className='w-full'
           />
         </div>

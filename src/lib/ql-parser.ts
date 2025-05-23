@@ -1,21 +1,20 @@
 import type {
-  JQLToken,
-  JQLQuery,
-  JQLOrderBy,
+  QLToken,
+  QLQuery,
+  QLOrderBy,
   ParseContext,
   OperatorType,
   LogicalOperatorType,
-  SortDirection,
-  JQLInputConfig,
-} from './jql-types';
-import { JQLExpressionParser } from './jql-expression-parser';
+  QLInputConfig,
+} from './ql-types';
+import { QLExpressionParser } from './ql-expression-parser';
 
 // Keywords and operators
 const LOGICAL_OPERATORS: LogicalOperatorType[] = ['AND', 'OR', 'NOT'];
-const COMPARISON_OPERATORS: OperatorType[] = ['=', '!=', '<>', '>', '<', '>=', '<='];
+const COMPARISON_OPERATORS: OperatorType[] = ['=', '!=', '>', '<', '>=', '<='];
 const TEXT_OPERATORS: OperatorType[] = ['~', '!~'];
 const LIST_OPERATORS: OperatorType[] = ['IN', 'NOT IN'];
-const NULL_OPERATORS: OperatorType[] = ['IS EMPTY', 'IS NOT EMPTY', 'IS NULL', 'IS NOT NULL'];
+const NULL_OPERATORS: OperatorType[] = ['IS EMPTY', 'IS NOT EMPTY'];
 const ALL_OPERATORS: OperatorType[] = [
   ...COMPARISON_OPERATORS,
   ...TEXT_OPERATORS,
@@ -24,22 +23,22 @@ const ALL_OPERATORS: OperatorType[] = [
 ];
 
 const KEYWORDS = ['ORDER', 'BY', 'ASC', 'DESC'];
-const SORT_DIRECTIONS: SortDirection[] = ['ASC', 'DESC'];
 
-export class JQLParser {
-  constructor(_config: JQLInputConfig) {
+export class QLParser {
+  constructor(_config: QLInputConfig) {
     // Config stored for future use if needed
   }
 
   /**
-   * Tokenize the input string into JQL tokens
+   * Tokenize the input string into QL tokens
    */
-  tokenize(input: string): JQLToken[] {
-    const tokens: JQLToken[] = [];
+  tokenize(input: string): QLToken[] {
+    const tokens: QLToken[] = [];
     let position = 0;
 
     while (position < input.length) {
       const char = input[position];
+      const remaining = input.slice(position);
 
       // Skip whitespace but track it
       if (/\s/.test(char)) {
@@ -49,6 +48,35 @@ export class JQLParser {
         }
         tokens.push({
           type: 'whitespace',
+          value: input.slice(start, position),
+          start,
+          end: position,
+        });
+        continue;
+      }
+
+      let matched = false;
+
+      // Handle quoted strings
+      if (char === '"' || char === "'") {
+        const quote = char;
+        const start = position;
+        position++; // Skip opening quote
+
+        while (position < input.length && input[position] !== quote) {
+          if (input[position] === '\\') {
+            position += 2; // Skip escaped character
+          } else {
+            position++;
+          }
+        }
+
+        if (position < input.length) {
+          position++; // Skip closing quote
+        }
+
+        tokens.push({
+          type: 'value',
           value: input.slice(start, position),
           start,
           end: position,
@@ -80,36 +108,29 @@ export class JQLParser {
         continue;
       }
 
-      // Handle quoted strings
-      if (char === '"' || char === "'") {
-        const quote = char;
+      // Handle single-character operators
+      if (['=', '!', '>', '<', '~'].includes(char)) {
         const start = position;
-        position++; // Skip opening quote
+        let operator = char;
 
-        while (position < input.length && input[position] !== quote) {
-          if (input[position] === '\\') {
-            position += 2; // Skip escaped character
-          } else {
+        // Check for multi-character operators
+        if (position + 1 < input.length) {
+          const nextChar = input[position + 1];
+          if ((char === '!' && nextChar === '=') || (char === '>' && nextChar === '=') || (char === '<' && nextChar === '=') || (char === '!' && nextChar === '~')) {
+            operator += nextChar;
             position++;
           }
         }
 
-        if (position < input.length) {
-          position++; // Skip closing quote
-        }
-
         tokens.push({
-          type: 'value',
-          value: input.slice(start, position),
+          type: 'operator',
+          value: operator,
           start,
-          end: position,
+          end: position + 1,
         });
+        position++;
         continue;
       }
-
-      // Handle operators and keywords
-      const remaining = input.slice(position);
-      let matched = false;
 
       // Check for multi-character operators first (case-insensitive)
       for (const op of ALL_OPERATORS.sort((a, b) => b.length - a.length)) {
@@ -185,24 +206,17 @@ export class JQLParser {
         position++;
       }
 
-      const word = input.slice(start, position);
-
-      // Determine if it's a function (ends with parentheses)
-      if (position < input.length && input[position] === '(') {
+      if (position > start) {
+        const value = input.slice(start, position);
         tokens.push({
-          type: 'function',
-          value: word,
+          type: 'unknown', // Will be classified later
+          value,
           start,
           end: position,
         });
       } else {
-        // Could be field or value - context will determine
-        tokens.push({
-          type: 'unknown',
-          value: word,
-          start,
-          end: position,
-        });
+        // Unknown character, skip it
+        position++;
       }
     }
 
@@ -212,7 +226,7 @@ export class JQLParser {
   /**
    * Classify unknown tokens based on context
    */
-  private classifyTokens(tokens: JQLToken[]): JQLToken[] {
+  private classifyTokens(tokens: QLToken[]): QLToken[] {
     const context: ParseContext = {
       input: '',
       position: 0,
@@ -230,12 +244,44 @@ export class JQLParser {
 
       if (token.type === 'whitespace') continue;
 
-      if (token.type === 'comma') {
-        // Commas don't change the context much, just continue
-        continue;
+      if (token.type === 'unknown') {
+        // Classify based on context
+        if (context.expectingField) {
+          token.type = 'field';
+          context.expectingField = false;
+          context.expectingOperator = true;
+        } else if (context.expectingValue) {
+          token.type = 'value';
+          context.expectingValue = false;
+          context.expectingLogical = true;
+        } else {
+          // Default to field if unsure
+          token.type = 'field';
+        }
       }
 
-      if (token.type === 'parenthesis') {
+      // Update context based on current token
+      if (token.type === 'field') {
+        context.expectingOperator = true;
+        context.expectingField = false;
+        context.expectingValue = false;
+        context.expectingLogical = false;
+      } else if (token.type === 'operator') {
+        context.expectingValue = true;
+        context.expectingField = false;
+        context.expectingOperator = false;
+        context.expectingLogical = false;
+      } else if (token.type === 'value') {
+        context.expectingLogical = true;
+        context.expectingField = false;
+        context.expectingOperator = false;
+        context.expectingValue = false;
+      } else if (token.type === 'logical') {
+        context.expectingField = true;
+        context.expectingOperator = false;
+        context.expectingValue = false;
+        context.expectingLogical = false;
+      } else if (token.type === 'parenthesis') {
         if (token.value === '(') {
           context.parenthesesLevel++;
           context.expectingField = true;
@@ -244,15 +290,12 @@ export class JQLParser {
           context.expectingLogical = false;
         } else {
           context.parenthesesLevel--;
+          context.expectingLogical = true;
           context.expectingField = false;
           context.expectingOperator = false;
           context.expectingValue = false;
-          context.expectingLogical = true;
         }
-        continue;
-      }
-
-      if (token.type === 'keyword') {
+      } else if (token.type === 'keyword') {
         if (token.value.toUpperCase() === 'ORDER') {
           context.inOrderBy = true;
           context.expectingField = false;
@@ -265,56 +308,6 @@ export class JQLParser {
           context.expectingValue = false;
           context.expectingLogical = false;
         }
-        continue;
-      }
-
-      if (token.type === 'logical') {
-        context.expectingField = true;
-        context.expectingOperator = false;
-        context.expectingValue = false;
-        context.expectingLogical = false;
-        continue;
-      }
-
-      if (token.type === 'operator') {
-        context.expectingField = false;
-        context.expectingOperator = false;
-        context.expectingValue = true;
-        context.expectingLogical = false;
-        continue;
-      }
-
-      if (token.type === 'value') {
-        context.expectingField = false;
-        context.expectingOperator = false;
-        context.expectingValue = false;
-        context.expectingLogical = true;
-        continue;
-      }
-
-      if (token.type === 'unknown') {
-        if (context.expectingField) {
-          token.type = 'field';
-          context.lastField = token.value;
-          context.expectingField = false;
-          context.expectingOperator = true;
-          context.expectingValue = false;
-          context.expectingLogical = false;
-        } else if (context.expectingValue) {
-          token.type = 'value';
-          context.expectingField = false;
-          context.expectingOperator = false;
-          context.expectingValue = false;
-          context.expectingLogical = true;
-        } else if (context.inOrderBy && SORT_DIRECTIONS.includes(token.value.toUpperCase() as SortDirection)) {
-          token.type = 'keyword';
-          token.value = token.value.toUpperCase();
-          context.expectingField = false;
-          context.expectingOperator = false;
-          context.expectingValue = false;
-          context.expectingLogical = true;
-          context.inOrderBy = false;
-        }
       }
     }
 
@@ -322,15 +315,15 @@ export class JQLParser {
   }
 
   /**
-   * Parse tokens into a JQL query object
+   * Parse tokens into a QL query object
    */
-  parse(input: string): JQLQuery {
+  parse(input: string): QLQuery {
     const tokens = this.tokenize(input);
-    const orderBy: JQLOrderBy[] = [];
+    const orderBy: QLOrderBy[] = [];
     const errors: string[] = [];
 
     // Use new expression parser for hierarchical structure
-    const expressionParser = new JQLExpressionParser();
+    const expressionParser = new QLExpressionParser();
     const whereExpression = expressionParser.parse(tokens);
 
     // Parse ORDER BY clause (simple implementation for now)

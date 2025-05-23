@@ -1,15 +1,15 @@
-import type { JQLToken, JQLExpression, JQLCondition, JQLLogicalGroup, OperatorType, LogicalOperatorType } from './jql-types';
+import type { QLToken, QLExpression, QLCondition, QLLogicalGroup, OperatorType, LogicalOperatorType } from './ql-types';
 
 /**
- * Enhanced JQL Expression Parser
+ * Enhanced QL Expression Parser
  * Builds hierarchical expression trees that properly represent logical grouping
  */
-export class JQLExpressionParser {
-  private tokens: JQLToken[] = [];
+export class QLExpressionParser {
+  private tokens: QLToken[] = [];
   private position = 0;
 
-  parse(tokens: JQLToken[]): JQLExpression | null {
-    this.tokens = tokens.filter(t => t.type !== 'whitespace'); // Remove whitespace for easier parsing
+  parse(tokens: QLToken[]): QLExpression | null {
+    this.tokens = tokens.filter((t) => t.type !== 'whitespace'); // Remove whitespace for easier parsing
     this.position = 0;
 
     if (this.tokens.length === 0) {
@@ -24,17 +24,17 @@ export class JQLExpressionParser {
     }
   }
 
-  private parseExpression(): JQLExpression {
+  private parseExpression(): QLExpression {
     return this.parseOrExpression();
   }
 
-  private parseOrExpression(): JQLExpression {
+  private parseOrExpression(): QLExpression {
     let left = this.parseAndExpression();
 
     while (this.current()?.type === 'logical' && this.current()?.value === 'OR') {
       this.advance(); // consume OR
       const right = this.parseAndExpression();
-      
+
       // Create OR group
       if (this.isLogicalGroup(left) && left.operator === 'OR') {
         // Extend existing OR group
@@ -43,7 +43,7 @@ export class JQLExpressionParser {
         // Create new OR group
         left = {
           operator: 'OR' as LogicalOperatorType,
-          conditions: [left, right]
+          conditions: [left, right],
         };
       }
     }
@@ -51,13 +51,13 @@ export class JQLExpressionParser {
     return left;
   }
 
-  private parseAndExpression(): JQLExpression {
+  private parseAndExpression(): QLExpression {
     let left = this.parsePrimaryExpression();
 
     while (this.current()?.type === 'logical' && this.current()?.value === 'AND') {
       this.advance(); // consume AND
       const right = this.parsePrimaryExpression();
-      
+
       // Create AND group
       if (this.isLogicalGroup(left) && left.operator === 'AND') {
         // Extend existing AND group
@@ -66,7 +66,7 @@ export class JQLExpressionParser {
         // Create new AND group
         left = {
           operator: 'AND' as LogicalOperatorType,
-          conditions: [left, right]
+          conditions: [left, right],
         };
       }
     }
@@ -74,7 +74,7 @@ export class JQLExpressionParser {
     return left;
   }
 
-  private parsePrimaryExpression(): JQLExpression {
+  private parsePrimaryExpression(): QLExpression {
     const token = this.current();
 
     if (!token) {
@@ -85,12 +85,12 @@ export class JQLExpressionParser {
     if (token.type === 'parenthesis' && token.value === '(') {
       this.advance(); // consume (
       const expr = this.parseExpression();
-      
+
       if (this.current()?.type !== 'parenthesis' || this.current()?.value !== ')') {
         throw new Error('Expected closing parenthesis');
       }
       this.advance(); // consume )
-      
+
       return expr;
     }
 
@@ -102,14 +102,14 @@ export class JQLExpressionParser {
     throw new Error(`Unexpected token: ${token.type} "${token.value}"`);
   }
 
-  private parseCondition(): JQLCondition {
+  private parseCondition(): QLCondition {
     const fieldToken = this.current();
     if (!fieldToken || fieldToken.type !== 'field') {
       throw new Error('Expected field name');
     }
 
-    const condition: Partial<JQLCondition> = {
-      field: fieldToken.value
+    const condition: Partial<QLCondition> = {
+      field: fieldToken.value,
     };
 
     this.advance(); // consume field
@@ -128,7 +128,7 @@ export class JQLExpressionParser {
       condition.value = this.parseValue(condition.operator);
     }
 
-    return condition as JQLCondition;
+    return condition as QLCondition;
   }
 
   private parseValue(operator: OperatorType): string | string[] {
@@ -145,13 +145,29 @@ export class JQLExpressionParser {
 
     if (token.type === 'value' || token.type === 'field' || token.type === 'function' || token.type === 'unknown') {
       let value = token.value;
-      
-      // Remove quotes if present
-      if ((value.startsWith('"') && value.endsWith('"')) ||
-          (value.startsWith("'") && value.endsWith("'"))) {
+
+      // Check if this is a function call (token followed by parentheses)
+      const nextToken = this.tokens[this.position + 1];
+      if (nextToken && nextToken.type === 'parenthesis' && nextToken.value === '(') {
+        // This is a function call, include the parentheses
+        this.advance(); // consume function name
+        this.advance(); // consume opening parenthesis
+
+        // Look for closing parenthesis
+        const closingToken = this.current();
+        if (closingToken && closingToken.type === 'parenthesis' && closingToken.value === ')') {
+          this.advance(); // consume closing parenthesis
+          return value + '()';
+        } else {
+          throw new Error('Expected closing parenthesis for function call');
+        }
+      }
+
+      // Remove quotes if present (for regular values)
+      if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
         value = value.slice(1, -1);
       }
-      
+
       this.advance();
       return value;
     }
@@ -170,18 +186,34 @@ export class JQLExpressionParser {
 
     while (this.current() && !(this.current()?.type === 'parenthesis' && this.current()?.value === ')')) {
       const token = this.current();
-      
+
       if (token?.type === 'value' || token?.type === 'field' || token?.type === 'function' || token?.type === 'unknown') {
         let value = token.value;
-        
-        // Remove quotes if present
-        if ((value.startsWith('"') && value.endsWith('"')) ||
-            (value.startsWith("'") && value.endsWith("'"))) {
-          value = value.slice(1, -1);
+
+        // Check if this is a function call (token followed by parentheses)
+        const nextToken = this.tokens[this.position + 1];
+        if (nextToken && nextToken.type === 'parenthesis' && nextToken.value === '(') {
+          // This is a function call, include the parentheses
+          this.advance(); // consume function name
+          this.advance(); // consume opening parenthesis
+
+          // Look for closing parenthesis
+          const closingToken = this.current();
+          if (closingToken && closingToken.type === 'parenthesis' && closingToken.value === ')') {
+            this.advance(); // consume closing parenthesis
+            value = value + '()';
+          } else {
+            throw new Error('Expected closing parenthesis for function call in IN list');
+          }
+        } else {
+          // Remove quotes if present (for regular values)
+          if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+            value = value.slice(1, -1);
+          }
+          this.advance();
         }
-        
+
         values.push(value);
-        this.advance();
 
         // Skip comma if present
         if (this.current()?.type === 'comma') {
@@ -205,7 +237,7 @@ export class JQLExpressionParser {
     return !['IS EMPTY', 'IS NOT EMPTY'].includes(operator);
   }
 
-  private current(): JQLToken | undefined {
+  private current(): QLToken | undefined {
     return this.tokens[this.position];
   }
 
@@ -213,7 +245,7 @@ export class JQLExpressionParser {
     this.position++;
   }
 
-  private isLogicalGroup(expr: JQLExpression): expr is JQLLogicalGroup {
+  private isLogicalGroup(expr: QLExpression): expr is QLLogicalGroup {
     return 'operator' in expr && 'conditions' in expr;
   }
 }

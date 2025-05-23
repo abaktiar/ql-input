@@ -1,11 +1,12 @@
-// Core types for JQL (JIRA Query Language) input component
+// Core types for QL (Query Language) input component
 
-export type FieldType = 'text' | 'number' | 'date' | 'datetime' | 'user' | 'option' | 'multiselect';
+// Field types
+export type FieldType = 'text' | 'number' | 'date' | 'datetime' | 'boolean' | 'option' | 'multiselect' | 'user';
 
+// Operators
 export type OperatorType =
   | '='
   | '!='
-  | '<>'
   | '>'
   | '<'
   | '>='
@@ -16,14 +17,16 @@ export type OperatorType =
   | 'NOT IN'
   | 'IS EMPTY'
   | 'IS NOT EMPTY'
-  | 'IS NULL'
-  | 'IS NOT NULL';
+  | 'WAS'
+  | 'WAS IN'
+  | 'WAS NOT IN'
+  | 'CHANGED';
 
 export type LogicalOperatorType = 'AND' | 'OR' | 'NOT';
 
 export type SortDirection = 'ASC' | 'DESC';
 
-export interface JQLField {
+export interface QLField {
   name: string;
   displayName: string;
   type: FieldType;
@@ -31,18 +34,18 @@ export interface JQLField {
   sortable?: boolean;
   description?: string;
   // For option/multiselect fields
-  options?: JQLValue[];
+  options?: QLValue[];
   // For async value suggestions
   asyncValueSuggestions?: boolean;
 }
 
-export interface JQLValue {
+export interface QLValue {
   value: string;
   displayValue?: string;
   description?: string;
 }
 
-export interface JQLFunction {
+export interface QLFunction {
   name: string;
   displayName: string;
   description?: string;
@@ -54,7 +57,7 @@ export interface JQLFunction {
   }[];
 }
 
-export interface JQLSuggestion {
+export interface QLSuggestion {
   type: 'field' | 'operator' | 'value' | 'logical' | 'keyword' | 'function' | 'parenthesis' | 'comma';
   value: string;
   displayValue?: string;
@@ -63,7 +66,7 @@ export interface JQLSuggestion {
   category?: string;
 }
 
-export interface JQLToken {
+export interface QLToken {
   type:
     | 'field'
     | 'operator'
@@ -83,7 +86,7 @@ export interface JQLToken {
 }
 
 // Basic condition (leaf node)
-export interface JQLCondition {
+export interface QLCondition {
   field: string;
   operator: OperatorType;
   value?: string | string[];
@@ -91,31 +94,31 @@ export interface JQLCondition {
 }
 
 // Logical group (branch node)
-export interface JQLLogicalGroup {
+export interface QLLogicalGroup {
   operator: LogicalOperatorType; // 'AND' | 'OR'
-  conditions: (JQLCondition | JQLLogicalGroup)[];
+  conditions: (QLCondition | QLLogicalGroup)[];
   not?: boolean;
 }
 
 // Expression can be either a single condition or a logical group
-export type JQLExpression = JQLCondition | JQLLogicalGroup;
+export type QLExpression = QLCondition | QLLogicalGroup;
 
-export interface JQLOrderBy {
+export interface QLOrderBy {
   field: string;
   direction: SortDirection;
 }
 
-export interface JQLQuery {
-  where?: JQLExpression; // Root expression (can be condition or logical group)
-  orderBy?: JQLOrderBy[];
+export interface QLQuery {
+  where?: QLExpression; // Root expression (can be condition or logical group)
+  orderBy?: QLOrderBy[];
   raw: string;
   valid: boolean;
   errors: string[];
 }
 
-export interface JQLInputConfig {
-  fields: JQLField[];
-  functions?: JQLFunction[];
+export interface QLInputConfig {
+  fields: QLField[];
+  functions?: QLFunction[];
   operators?: OperatorType[];
   logicalOperators?: LogicalOperatorType[];
   keywords?: string[];
@@ -127,26 +130,26 @@ export interface JQLInputConfig {
   allowFunctions?: boolean;
 }
 
-export interface JQLInputProps {
+export interface QLInputProps {
   value?: string;
-  onChange?: (value: string, query: JQLQuery) => void;
-  onExecute?: (query: JQLQuery) => void;
-  config: JQLInputConfig;
+  onChange?: (value: string, query: QLQuery) => void;
+  onExecute?: (query: QLQuery) => void;
+  config: QLInputConfig;
   placeholder?: string;
   disabled?: boolean;
   className?: string;
   // Async value suggestions
-  getAsyncValueSuggestions?: (field: string, typedValue: string) => Promise<JQLValue[]>;
+  getAsyncValueSuggestions?: (field: string, typedValue: string) => Promise<QLValue[]>;
   // Predefined value suggestions
-  getPredefinedValueSuggestions?: (field: string) => JQLValue[];
+  getPredefinedValueSuggestions?: (field: string) => QLValue[];
 }
 
 // Parser context for tracking current position and state
 export interface ParseContext {
   input: string;
   position: number;
-  tokens: JQLToken[];
-  currentToken?: JQLToken;
+  tokens: QLToken[];
+  currentToken?: QLToken;
   expectingField: boolean;
   expectingOperator: boolean;
   expectingValue: boolean;
@@ -160,10 +163,10 @@ export interface ParseContext {
 export interface SuggestionContext {
   input: string;
   cursorPosition: number;
-  tokens: JQLToken[];
-  currentToken?: JQLToken;
-  previousToken?: JQLToken;
-  nextToken?: JQLToken;
+  tokens: QLToken[];
+  currentToken?: QLToken;
+  previousToken?: QLToken;
+  nextToken?: QLToken;
   expectingField: boolean;
   expectingOperator: boolean;
   expectingValue: boolean;
@@ -183,14 +186,14 @@ export interface ValidationError {
   severity: 'error' | 'warning';
 }
 
-export interface JQLInputState {
+export interface QLInputState {
   value: string;
-  tokens: JQLToken[];
-  suggestions: JQLSuggestion[];
+  tokens: QLToken[];
+  suggestions: QLSuggestion[];
   showSuggestions: boolean;
   selectedSuggestionIndex: number;
   cursorPosition: number;
-  query: JQLQuery;
+  query: QLQuery;
   validationErrors: ValidationError[];
   isLoading: boolean;
 }

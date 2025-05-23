@@ -1,27 +1,25 @@
 // Debug script to test JQL functionality
-import { JQLParser } from './lib/jql-parser';
-import { JQLSuggestionEngine } from './lib/jql-suggestions';
-import type { JQLInputConfig } from './lib/jql-types';
+import { QLParser } from './lib/ql-parser';
+import { QLSuggestionEngine } from './lib/ql-suggestions';
+import type { QLInputConfig } from './lib/ql-types';
 
-const config: JQLInputConfig = {
+const config: QLInputConfig = {
   fields: [
     {
       name: 'project',
       displayName: 'Project',
       type: 'option',
       operators: ['=', '!=', 'IN', 'NOT IN'],
-      options: [
-        { value: 'PROJ1', displayValue: 'Project Alpha' }
-      ]
-    }
+      options: [{ value: 'PROJ1', displayValue: 'Project Alpha' }],
+    },
   ],
   maxSuggestions: 10,
   allowParentheses: true,
-  allowOrderBy: true
+  allowOrderBy: true,
 };
 
-const parser = new JQLParser(config);
-const suggestionEngine = new JQLSuggestionEngine(config);
+const parser = new QLParser(config);
+const suggestionEngine = new QLSuggestionEngine(config);
 
 // Test cases
 const testCases = [

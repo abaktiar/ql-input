@@ -1,26 +1,26 @@
 import { useState, useCallback, useRef } from 'react';
-import type { JQLInputState, JQLInputConfig, JQLSuggestion, JQLQuery, JQLValue } from '@/lib/jql-types';
-import { JQLParser } from '@/lib/jql-parser';
-import { JQLSuggestionEngine } from '@/lib/jql-suggestions';
+import type { QLInputState, QLInputConfig, QLSuggestion, QLQuery, QLValue } from '@/lib/ql-types';
+import { QLParser } from '@/lib/ql-parser';
+import { QLSuggestionEngine } from '@/lib/ql-suggestions';
 
-interface UseJQLInputProps {
-  config: JQLInputConfig;
+interface UseQLInputProps {
+  config: QLInputConfig;
   initialValue?: string;
-  onChange?: (value: string, query: JQLQuery) => void;
-  onExecute?: (query: JQLQuery) => void;
-  getAsyncValueSuggestions?: (field: string, typedValue: string) => Promise<JQLValue[]>;
-  getPredefinedValueSuggestions?: (field: string) => JQLValue[];
+  onChange?: (value: string, query: QLQuery) => void;
+  onExecute?: (query: QLQuery) => void;
+  getAsyncValueSuggestions?: (field: string, typedValue: string) => Promise<QLValue[]>;
+  getPredefinedValueSuggestions?: (field: string) => QLValue[];
 }
 
-export function useJQLInput({
+export function useQLInput({
   config,
   initialValue = '',
   onChange,
   onExecute,
   getAsyncValueSuggestions,
   getPredefinedValueSuggestions,
-}: UseJQLInputProps) {
-  const [state, setState] = useState<JQLInputState>({
+}: UseQLInputProps) {
+  const [state, setState] = useState<QLInputState>({
     value: initialValue,
     tokens: [],
     suggestions: [],
@@ -32,8 +32,8 @@ export function useJQLInput({
     isLoading: false,
   });
 
-  const parser = useRef(new JQLParser(config));
-  const suggestionEngine = useRef(new JQLSuggestionEngine(config));
+  const parser = useRef(new QLParser(config));
+  const suggestionEngine = useRef(new QLSuggestionEngine(config));
 
   // Parse query and update tokens
   const updateQuery = useCallback(
@@ -68,7 +68,7 @@ export function useJQLInput({
 
           try {
             const asyncValues = await getAsyncValueSuggestions(context.lastField!, context.partialInput);
-            const asyncSuggestions: JQLSuggestion[] = asyncValues.map((value) => ({
+            const asyncSuggestions: QLSuggestion[] = asyncValues.map((value) => ({
               type: 'value',
               value: value.value,
               displayValue: value.displayValue || value.value,
@@ -89,7 +89,7 @@ export function useJQLInput({
       // Add predefined value suggestions
       if (context.expectingValue && context.lastField && getPredefinedValueSuggestions) {
         const predefinedValues = getPredefinedValueSuggestions(context.lastField);
-        const predefinedSuggestions: JQLSuggestion[] = predefinedValues.map((value) => ({
+        const predefinedSuggestions: QLSuggestion[] = predefinedValues.map((value) => ({
           type: 'value',
           value: value.value,
           displayValue: value.displayValue || value.value,
@@ -129,7 +129,7 @@ export function useJQLInput({
 
   // Handle suggestion selection
   const selectSuggestion = useCallback(
-    (suggestion: JQLSuggestion) => {
+    (suggestion: QLSuggestion) => {
       const { value, cursorPosition, tokens } = state;
 
       // Find the current token to replace
@@ -138,19 +138,60 @@ export function useJQLInput({
       let newValue: string;
       let newCursorPosition: number;
 
-      if (currentToken && currentToken.type !== 'whitespace') {
-        // Replace the current token
-        const before = value.slice(0, currentToken.start);
-        const after = value.slice(currentToken.end);
-        const insertText = suggestion.insertText || suggestion.value;
+      // Determine if we should add a space after the suggestion
+      const shouldAddSpace = (suggestion: QLSuggestion): boolean => {
+        // Don't add space for certain types that already include spacing or punctuation
+        if (suggestion.insertText) {
+          // If insertText is provided, use it as-is (it might already include spacing)
+          return false;
+        }
 
-        newValue = before + insertText + after;
-        newCursorPosition = currentToken.start + insertText.length;
+        // Add space for most suggestion types except punctuation
+        return !['parenthesis', 'comma'].includes(suggestion.type);
+      };
+
+      if (currentToken && currentToken.type !== 'whitespace') {
+        // Special case: if we're on a parenthesis or comma in an IN list, insert after it instead of replacing
+        const isInListPunctuation =
+          (currentToken.type === 'parenthesis' && currentToken.value === '(') || currentToken.type === 'comma';
+
+        if (isInListPunctuation && (suggestion.type === 'value' || suggestion.type === 'function')) {
+          // Insert after the punctuation token
+          const before = value.slice(0, currentToken.end);
+          const after = value.slice(currentToken.end);
+          let insertText = suggestion.insertText || suggestion.value;
+
+          // Add space if needed and there's no space already after
+          if (shouldAddSpace(suggestion) && !after.startsWith(' ')) {
+            insertText += ' ';
+          }
+
+          newValue = before + insertText + after;
+          newCursorPosition = currentToken.end + insertText.length;
+        } else {
+          // Replace the current token
+          const before = value.slice(0, currentToken.start);
+          const after = value.slice(currentToken.end);
+          let insertText = suggestion.insertText || suggestion.value;
+
+          // Add space if needed and there's no space already after
+          if (shouldAddSpace(suggestion) && !after.startsWith(' ')) {
+            insertText += ' ';
+          }
+
+          newValue = before + insertText + after;
+          newCursorPosition = currentToken.start + insertText.length;
+        }
       } else {
         // Insert at cursor position
         const before = value.slice(0, cursorPosition);
         const after = value.slice(cursorPosition);
-        const insertText = suggestion.insertText || suggestion.value;
+        let insertText = suggestion.insertText || suggestion.value;
+
+        // Add space if needed and there's no space already after
+        if (shouldAddSpace(suggestion) && !after.startsWith(' ')) {
+          insertText += ' ';
+        }
 
         newValue = before + insertText + after;
         newCursorPosition = cursorPosition + insertText.length;

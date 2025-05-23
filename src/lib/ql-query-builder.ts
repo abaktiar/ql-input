@@ -1,22 +1,22 @@
-import type { JQLExpression, JQLCondition, JQLLogicalGroup } from './jql-types';
+import type { QLExpression, QLCondition, QLLogicalGroup } from './ql-types';
 
 /**
- * Helper functions to work with JQL expressions and convert them to database queries
+ * Helper functions to work with QL expressions and convert them to database queries
  */
 
 // Type guards
-export function isCondition(expr: JQLExpression): expr is JQLCondition {
+export function isCondition(expr: QLExpression): expr is QLCondition {
   return 'field' in expr && 'operator' in expr;
 }
 
-export function isLogicalGroup(expr: JQLExpression): expr is JQLLogicalGroup {
+export function isLogicalGroup(expr: QLExpression): expr is QLLogicalGroup {
   return 'operator' in expr && 'conditions' in expr;
 }
 
 /**
- * Convert JQL expression to Mongoose query
+ * Convert QL expression to Mongoose query
  */
-export function toMongooseQuery(expr: JQLExpression): any {
+export function toMongooseQuery(expr: QLExpression): any {
   if (isCondition(expr)) {
     return conditionToMongoDB(expr);
   } else if (isLogicalGroup(expr)) {
@@ -25,7 +25,7 @@ export function toMongooseQuery(expr: JQLExpression): any {
   return {};
 }
 
-function conditionToMongoDB(condition: JQLCondition): any {
+function conditionToMongoDB(condition: QLCondition): any {
   const { field, operator, value } = condition;
   
   switch (operator) {
@@ -58,7 +58,7 @@ function conditionToMongoDB(condition: JQLCondition): any {
   }
 }
 
-function logicalGroupToMongoDB(group: JQLLogicalGroup): any {
+function logicalGroupToMongoDB(group: QLLogicalGroup): any {
   const conditions = group.conditions.map(toMongooseQuery);
   
   if (group.operator === 'AND') {
@@ -71,9 +71,9 @@ function logicalGroupToMongoDB(group: JQLLogicalGroup): any {
 }
 
 /**
- * Convert JQL expression to SQL WHERE clause
+ * Convert QL expression to SQL WHERE clause
  */
-export function toSQLQuery(expr: JQLExpression): string {
+export function toSQLQuery(expr: QLExpression): string {
   if (isCondition(expr)) {
     return conditionToSQL(expr);
   } else if (isLogicalGroup(expr)) {
@@ -82,7 +82,7 @@ export function toSQLQuery(expr: JQLExpression): string {
   return '';
 }
 
-function conditionToSQL(condition: JQLCondition): string {
+function conditionToSQL(condition: QLCondition): string {
   const { field, operator, value } = condition;
   
   switch (operator) {
@@ -117,7 +117,7 @@ function conditionToSQL(condition: JQLCondition): string {
   }
 }
 
-function logicalGroupToSQL(group: JQLLogicalGroup): string {
+function logicalGroupToSQL(group: QLLogicalGroup): string {
   const conditions = group.conditions.map(toSQLQuery);
   const operator = group.operator;
   
@@ -131,7 +131,7 @@ function logicalGroupToSQL(group: JQLLogicalGroup): string {
 /**
  * Count total conditions in an expression
  */
-export function countConditions(expr: JQLExpression): number {
+export function countConditions(expr: QLExpression): number {
   if (isCondition(expr)) {
     return 1;
   } else if (isLogicalGroup(expr)) {
@@ -143,7 +143,7 @@ export function countConditions(expr: JQLExpression): number {
 /**
  * Get all field names used in an expression
  */
-export function getUsedFields(expr: JQLExpression): string[] {
+export function getUsedFields(expr: QLExpression): string[] {
   if (isCondition(expr)) {
     return [expr.field];
   } else if (isLogicalGroup(expr)) {
@@ -155,7 +155,7 @@ export function getUsedFields(expr: JQLExpression): string[] {
 /**
  * Pretty print expression for debugging
  */
-export function printExpression(expr: JQLExpression, indent = 0): string {
+export function printExpression(expr: QLExpression, indent = 0): string {
   const spaces = '  '.repeat(indent);
   
   if (isCondition(expr)) {

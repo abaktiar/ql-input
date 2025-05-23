@@ -1,19 +1,19 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import type { JQLInputProps, JQLSuggestion } from "@/lib/jql-types";
-import { useJQLInput } from "@/hooks/use-jql-input";
-import { Popover, PopoverContent, PopoverTrigger } from "./popover";
+import type { QLInputProps, QLSuggestion } from '@/lib/ql-types';
+import { useQLInput } from '@/hooks/use-ql-input';
+import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import { Command, CommandEmpty, CommandItem, CommandList } from './command';
 import { Loader2, Search, X } from 'lucide-react';
 
-const JQLInput = React.forwardRef<HTMLInputElement, JQLInputProps>(
+const QLInput = React.forwardRef<HTMLInputElement, QLInputProps>(
   (
     {
       value,
       onChange,
       onExecute,
       config,
-      placeholder = 'Enter JQL query...',
+      placeholder = 'Enter QL query...',
       disabled = false,
       className,
       getAsyncValueSuggestions,
@@ -25,7 +25,7 @@ const JQLInput = React.forwardRef<HTMLInputElement, JQLInputProps>(
     const inputRef = React.useRef<HTMLInputElement>(null);
     const [isOpen, setIsOpen] = React.useState(false);
 
-    const { state, handleInputChange, handleKeyDown, selectSuggestion } = useJQLInput({
+    const { state, handleInputChange, handleKeyDown, selectSuggestion } = useQLInput({
       config,
       initialValue: value || '',
       onChange,
@@ -61,7 +61,7 @@ const JQLInput = React.forwardRef<HTMLInputElement, JQLInputProps>(
 
     // Handle suggestion selection
     const handleSuggestionSelect = React.useCallback(
-      (suggestion: JQLSuggestion) => {
+      (suggestion: QLSuggestion) => {
         selectSuggestion(suggestion);
         setIsOpen(false);
         inputRef.current?.focus();
@@ -204,6 +204,6 @@ const JQLInput = React.forwardRef<HTMLInputElement, JQLInputProps>(
   }
 );
 
-JQLInput.displayName = "JQLInput";
+QLInput.displayName = 'QLInput';
 
-export { JQLInput };
+export { QLInput };

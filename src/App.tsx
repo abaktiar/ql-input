@@ -1,9 +1,9 @@
-import { JQLDemo } from '@/components/jql-demo';
+import { QLDemo } from '@/components/ql-demo';
 
 function App() {
   return (
     <div className='container mx-auto py-8 px-4'>
-      <JQLDemo />
+      <QLDemo />
     </div>
   );
 }
