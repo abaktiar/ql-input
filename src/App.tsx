@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button"
+import { JQLDemo } from '@/components/jql-demo';
 
 function App() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-svh">
-      <Button>Click me</Button>
+    <div className='container mx-auto py-8 px-4'>
+      <JQLDemo />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

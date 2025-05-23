@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test IN List Issue</title>
+</head>
+<body>
+    <h1>Testing IN List Issue</h1>
+    <p>Open console and check the logs</p>
+    
+    <script type="module">
+        // Manual step-by-step analysis
+        console.log('=== MANUAL ANALYSIS ===');
+        
+        const input = 'project IN (PROJ1, pro';
+        const cursorPosition = 22; // At the end
+        
+        console.log('Input:', input);
+        console.log('Cursor:', cursorPosition);
+        console.log('Expected tokens:');
+        console.log('1. project (field) [0-7]');
+        console.log('2. " " (whitespace) [7-8]');
+        console.log('3. IN (operator) [8-10]');
+        console.log('4. " " (whitespace) [10-11]');
+        console.log('5. ( (parenthesis) [11-12]');
+        console.log('6. PROJ1 (value) [12-17]');
+        console.log('7. , (comma) [17-18]');
+        console.log('8. " " (whitespace) [18-19]');
+        console.log('9. pro (unknown/partial) [19-22]');
+        
+        console.log('\nExpected analysis:');
+        console.log('- Current token: pro (unknown) at cursor 22');
+        console.log('- Tokens to analyze: project, IN, (, PROJ1, ,');
+        console.log('- After project: lastField="project", expectingOperator=true');
+        console.log('- After IN: foundInOperator=true, expectingValue=true');
+        console.log('- After (: inInList=true, expectingValue=true');
+        console.log('- After PROJ1: inInList=true, expectingValue=true (should stay true)');
+        console.log('- After ,: inInList=true, expectingValue=true');
+        console.log('- Final: inInList=true, expectingValue=true, lastField="project"');
+        console.log('- Should trigger IN list suggestions!');
+        
+        // Test the actual character positions
+        console.log('\nActual character analysis:');
+        for (let i = 0; i < input.length; i++) {
+            console.log(`${i}: "${input[i]}"`);
+        }
+    </script>
+</body>
+</html>
