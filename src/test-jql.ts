@@ -1,4 +1,4 @@
-// Simple test to verify JQL parser functionality
+// Simple test to verify QL parser functionality
 import { QLParser } from './lib/ql-parser';
 import { QLSuggestionEngine } from './lib/ql-suggestions';
 import type { QLInputConfig } from './lib/ql-types';

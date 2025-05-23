@@ -1,4 +1,4 @@
-// Debug script to test JQL functionality
+// Debug script to test QL functionality
 import { QLParser } from './lib/ql-parser';
 import { QLSuggestionEngine } from './lib/ql-suggestions';
 import type { QLInputConfig } from './lib/ql-types';
@@ -33,7 +33,7 @@ const testCases = [
   { input: '', cursor: 0, description: 'Empty input' },
 ];
 
-console.log('=== JQL Debug Tests ===');
+console.log('=== QL Debug Tests ===');
 
 // Focus on the problematic case first
 const problematicCase = {

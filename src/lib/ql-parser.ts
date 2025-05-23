@@ -6,6 +6,8 @@ import type {
   OperatorType,
   LogicalOperatorType,
   QLInputConfig,
+  QLExpression,
+  SortDirection,
 } from './ql-types';
 import { QLExpressionParser } from './ql-expression-parser';
 
@@ -318,16 +320,30 @@ export class QLParser {
    * Parse tokens into a QL query object
    */
   parse(input: string): QLQuery {
-    const tokens = this.tokenize(input);
-    const orderBy: QLOrderBy[] = [];
     const errors: string[] = [];
+    let whereExpression: QLExpression | undefined = undefined;
+    let orderBy: QLOrderBy[] = [];
 
-    // Use new expression parser for hierarchical structure
-    const expressionParser = new QLExpressionParser();
-    const whereExpression = expressionParser.parse(tokens);
+    try {
+      // Split input into WHERE and ORDER BY parts
+      const { whereClause, orderByClause } = this.splitQuery(input);
 
-    // Parse ORDER BY clause (simple implementation for now)
-    // TODO: Enhance ORDER BY parsing if needed
+      // Parse WHERE clause if present
+      if (whereClause.trim()) {
+        const tokens = this.tokenize(whereClause);
+        const expressionParser = new QLExpressionParser();
+        const result = expressionParser.parse(tokens);
+        whereExpression = result || undefined;
+      }
+
+      // Parse ORDER BY clause if present
+      if (orderByClause.trim()) {
+        orderBy = this.parseOrderBy(orderByClause);
+      }
+    } catch (error) {
+      // Capture parse errors
+      errors.push(error instanceof Error ? error.message : 'Parse error');
+    }
 
     return {
       where: whereExpression || undefined,
@@ -336,5 +352,45 @@ export class QLParser {
       valid: errors.length === 0,
       errors,
     };
+  }
+
+  private splitQuery(input: string): { whereClause: string; orderByClause: string } {
+    // Find ORDER BY keyword (case insensitive)
+    const orderByMatch = input.match(/\s*ORDER\s+BY\s+/i);
+
+    if (!orderByMatch) {
+      return { whereClause: input, orderByClause: '' };
+    }
+
+    const orderByIndex = orderByMatch.index! + orderByMatch[0].length;
+    const whereClause = input.substring(0, orderByMatch.index!);
+    const orderByClause = input.substring(orderByIndex);
+
+    return { whereClause, orderByClause };
+  }
+
+  private parseOrderBy(orderByClause: string): QLOrderBy[] {
+    const orderByItems: QLOrderBy[] = [];
+
+    // Split by comma for multiple ORDER BY fields
+    const items = orderByClause.split(',').map(item => item.trim());
+
+    for (const item of items) {
+      const parts = item.trim().split(/\s+/);
+
+      if (parts.length === 0 || !parts[0]) {
+        continue;
+      }
+
+      const field = parts[0];
+      const direction = parts.length > 1 && parts[1].toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+
+      orderByItems.push({
+        field,
+        direction: direction as SortDirection,
+      });
+    }
+
+    return orderByItems;
   }
 }

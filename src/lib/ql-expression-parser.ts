@@ -16,12 +16,14 @@ export class QLExpressionParser {
       return null;
     }
 
-    try {
-      return this.parseExpression();
-    } catch (error) {
-      console.error('Parse error:', error);
+    // Check if all tokens are keywords (like ORDER BY) - if so, return null
+    const hasNonKeywordTokens = this.tokens.some((token) => token.type !== 'keyword' && token.type !== 'whitespace');
+
+    if (!hasNonKeywordTokens) {
       return null;
     }
+
+    return this.parseExpression();
   }
 
   private parseExpression(): QLExpression {
@@ -79,6 +81,21 @@ export class QLExpressionParser {
 
     if (!token) {
       throw new Error('Unexpected end of input');
+    }
+
+    // Handle NOT operator
+    if (token.type === 'logical' && token.value === 'NOT') {
+      this.advance(); // consume NOT
+      const expr = this.parsePrimaryExpression();
+
+      // Apply NOT to the expression
+      if ('operator' in expr && 'conditions' in expr) {
+        // It's a logical group
+        return { ...expr, not: true };
+      } else {
+        // It's a condition
+        return { ...expr, not: true };
+      }
     }
 
     // Handle parentheses

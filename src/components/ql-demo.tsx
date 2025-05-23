@@ -309,7 +309,9 @@ export function QLDemo() {
           <div>
             <h3 className='text-lg font-semibold mb-2'>📄 Complete Parsed Query</h3>
             <div className='bg-muted p-4 rounded-lg'>
-              <pre className='text-sm overflow-x-auto'>{JSON.stringify(parsedQuery, null, 2)}</pre>
+              <pre className='text-sm overflow-x-auto' data-testid='parse-result'>
+                {JSON.stringify(parsedQuery, null, 2)}
+              </pre>
             </div>
           </div>
         </div>

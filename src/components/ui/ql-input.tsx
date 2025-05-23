@@ -121,6 +121,7 @@ const QLInput = React.forwardRef<HTMLInputElement, QLInputProps>(
                     !state.query.valid && state.value && 'ring-2 ring-red-500/20 border-red-500/50',
                     className
                   )}
+                  data-testid='ql-input'
                   {...props}
                 />
                 {state.value && (
@@ -141,7 +142,8 @@ const QLInput = React.forwardRef<HTMLInputElement, QLInputProps>(
           <PopoverContent
             className='w-[--radix-popover-trigger-width] p-0'
             align='start'
-            onOpenAutoFocus={(e) => e.preventDefault()}>
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            data-testid="suggestions-list">
             <Command shouldFilter={false}>
               <CommandList>
                 {state.suggestions.length === 0 ? (
@@ -157,7 +159,8 @@ const QLInput = React.forwardRef<HTMLInputElement, QLInputProps>(
                         className={cn(
                           'flex flex-col items-start gap-1 cursor-pointer',
                           isSelected && 'bg-accent text-accent-foreground'
-                        )}>
+                        )}
+                        data-testid="suggestion-item">
                         <div className='flex items-center gap-2'>
                           <span
                             className={cn(

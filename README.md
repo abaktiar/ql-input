@@ -1,8 +1,8 @@
-# JQL Input Component
+# QL Input Component
 
-A comprehensive JQL (JIRA Query Language) input component built with React, TypeScript, and shadcn/ui. Features intelligent autocomplete, syntax highlighting, query parsing, and validation.
+A comprehensive QL (Query Language) input component built with React, TypeScript, and shadcn/ui. Features intelligent autocomplete, syntax highlighting, query parsing, and validation.
 
-![JQL Input Demo](https://via.placeholder.com/800x400/1f2937/ffffff?text=JQL+Input+Component+Demo)
+![QL Input Demo](https://via.placeholder.com/800x400/1f2937/ffffff?text=QL+Input+Component+Demo)
 
 ## ✨ Features
 
@@ -11,7 +11,7 @@ A comprehensive JQL (JIRA Query Language) input component built with React, Type
 - 🎨 **Visual feedback** - Query validation status and condition count
 - ⌨️ **Keyboard navigation** - Full keyboard support (↑↓ Enter Esc Tab)
 - 🔧 **Configurable fields** - Define custom fields, operators, and values
-- 📝 **Query parsing** - Complete JQL query structure parsing
+- 📝 **Query parsing** - Complete QL query structure parsing
 - 🎯 **Parentheses grouping** - Support for complex condition grouping
 
 ### Advanced Features
@@ -40,10 +40,10 @@ Visit `http://localhost:5173` to see the interactive demo.
 ## 📖 Usage
 
 ```tsx
-import { JQLInput } from '@/components/ui/jql-input';
-import type { JQLInputConfig } from '@/lib/jql-types';
+import { QLInput } from '@/components/ui/ql-input';
+import type { QLInputConfig } from '@/lib/ql-types';
 
-const config: JQLInputConfig = {
+const config: QLInputConfig = {
   fields: [
     {
       name: 'project',
@@ -80,7 +80,7 @@ function MyComponent() {
   };
 
   return (
-    <JQLInput
+    <QLInput
       value={query}
       onChange={(value, parsedQuery) => {
         setQuery(value);
@@ -91,7 +91,7 @@ function MyComponent() {
       }}
       config={config}
       getAsyncValueSuggestions={handleAsyncSuggestions}
-      placeholder="Enter your JQL query..."
+      placeholder="Enter your QL query..."
     />
   );
 }
@@ -99,9 +99,9 @@ function MyComponent() {
 
 ## 🎯 Example Queries
 
-The component supports complex JQL queries:
+The component supports complex QL queries:
 
-```jql
+```sql
 # Basic field filtering
 project = PROJ1 AND status = "In Progress"
 
@@ -161,19 +161,62 @@ summary ~ "bug" AND status != Done
 src/
 ├── components/
 │   ├── ui/
-│   │   ├── jql-input.tsx      # Main JQL input component
+│   │   ├── ql-input.tsx       # Main QL input component
 │   │   ├── input.tsx          # Base input component
 │   │   ├── popover.tsx        # Suggestion popover
 │   │   └── command.tsx        # Command palette
-│   └── jql-demo.tsx           # Demo component
+│   └── ql-demo.tsx            # Demo component
 ├── lib/
-│   ├── jql-types.ts           # TypeScript types
-│   ├── jql-parser.ts          # Query parser
-│   └── jql-suggestions.ts     # Suggestion engine
-└── hooks/
-    ├── use-jql-input.ts       # Main input logic
-    └── use-debounce.ts        # Debouncing utility
+│   ├── ql-types.ts            # TypeScript types
+│   ├── ql-parser.ts           # Query parser
+│   └── ql-suggestions.ts      # Suggestion engine
+├── hooks/
+│   ├── use-ql-input.ts        # Main input logic
+│   └── use-debounce.ts        # Debouncing utility
+docs/
+├── README.md                  # Documentation index
+├── FINAL_SUMMARY.md           # Project status and features
+├── USAGE_EXAMPLES.md          # Implementation examples
+├── TESTING.md                 # Testing guide
+└── CLEANUP_GUIDE.md           # Maintenance procedures
+tests/
+├── unit/                      # Unit tests
+├── integration/               # Integration tests
+└── e2e/                       # End-to-end tests
 ```
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+npm test
+
+# Run specific test types
+npm run test:unit
+npm run test:integration
+npm run test:e2e
+
+# Development and debugging
+npm run test:headed      # Run with browser UI
+npm run test:debug       # Debug mode
+npm run test:ui          # Playwright UI
+npm run test:report      # View HTML report
+
+# Cleanup test artifacts
+npm run test:clean       # Remove test results, reports, and cache
+```
+
+For detailed testing information, see [Testing Guide](docs/TESTING.md) and [Cleanup Guide](docs/CLEANUP_GUIDE.md).
+
+## 📚 Documentation
+
+Complete documentation is available in the [`docs/`](docs/) directory:
+
+- **[Documentation Index](docs/README.md)** - Complete documentation overview
+- **[Final Summary](docs/FINAL_SUMMARY.md)** - Project status and features
+- **[Usage Examples](docs/USAGE_EXAMPLES.md)** - Implementation patterns and examples
+- **[Testing Guide](docs/TESTING.md)** - Testing setup and procedures
+- **[Cleanup Guide](docs/CLEANUP_GUIDE.md)** - Maintenance and cleanup procedures
 
 ## 🤝 Contributing
 
