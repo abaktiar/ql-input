@@ -6,6 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:parser": "vite build --config vite.config.parser.ts",
+    "build:input": "vite build --config vite.config.input.ts",
+    "build:packages": "npm run build:parser && npm run build:input",
+    "publish:parser": "cp package-parser.json dist/parser/package.json && cp README-parser.md dist/parser/README.md && cd dist/parser && npm publish --access public && cd ../..",
+    "publish:input": "cp package-input.json dist/input/package.json && cp README-input.md dist/input/README.md && cd dist/input && npm publish --access public && cd ../..",
+    "publish:all": "npm run build:packages && npm run publish:parser && npm run publish:input",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "playwright test",
@@ -43,9 +49,11 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
+    "terser": "^5.39.2",
     "tw-animate-css": "^1.3.0",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.30.1",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vite-plugin-dts": "^4.5.4"
   }
 }

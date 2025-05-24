@@ -1,0 +1,41 @@
+{
+  "name": "@abaktiar/ql-parser",
+  "version": "1.0.1",
+  "description": "Framework-agnostic QL (Query Language) parser and builder for creating complex queries with support for logical operators, functions, and ORDER BY clauses",
+  "main": "./index.js",
+  "module": "./index.mjs",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "require": "./index.js",
+      "types": "./index.d.ts"
+    }
+  },
+  "files": ["index.js", "index.mjs", "index.d.ts", "README.md"],
+  "keywords": [
+    "query",
+    "parser",
+    "ql",
+    "typescript",
+    "query-language",
+    "expression-parser",
+    "query-builder",
+    "logical-operators",
+    "framework-agnostic"
+  ],
+  "author": "abaktiar",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abaktiar/ql-input.git"
+  },
+  "bugs": {
+    "url": "https://github.com/abaktiar/ql-input/issues"
+  },
+  "homepage": "https://github.com/abaktiar/ql-input#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "sideEffects": false
+}

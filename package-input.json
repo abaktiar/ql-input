@@ -1,0 +1,56 @@
+{
+  "name": "@abaktiar/ql-input",
+  "version": "1.0.1",
+  "description": "React QL input component with intelligent autocomplete, syntax highlighting, and query validation. Built with TypeScript and shadcn/ui components.",
+  "main": "./index.js",
+  "module": "./index.mjs",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "require": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./styles.css": "./styles.css"
+  },
+  "files": ["index.js", "index.mjs", "index.d.ts", "styles.css", "README.md"],
+  "keywords": [
+    "react",
+    "query",
+    "input",
+    "autocomplete",
+    "typescript",
+    "shadcn",
+    "ui-component",
+    "query-builder",
+    "syntax-highlighting",
+    "validation"
+  ],
+  "author": "abaktiar",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abaktiar/ql-input.git"
+  },
+  "bugs": {
+    "url": "https://github.com/abaktiar/ql-input/issues"
+  },
+  "homepage": "https://github.com/abaktiar/ql-input#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "dependencies": {
+    "@radix-ui/react-popover": "^1.1.3",
+    "@radix-ui/react-slot": "^1.2.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.0.4",
+    "lucide-react": "^0.511.0",
+    "tailwind-merge": "^3.3.0"
+  },
+  "sideEffects": ["*.css"]
+}
