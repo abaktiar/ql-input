@@ -1,0 +1,28 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with modern gradient -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6366f1"/>
+      <stop offset="1" stop-color="#3b82f6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main background -->
+  <rect width="32" height="32" rx="7" fill="url(#bg)"/>
+
+  <!-- QL Letters - using paths for better compatibility -->
+  <!-- Q -->
+  <path d="M8 12C8 10.3431 9.34315 9 11 9C12.6569 9 14 10.3431 14 12V16C14 17.6569 12.6569 19 11 19C9.34315 19 8 17.6569 8 16V12Z" stroke="white" stroke-width="1.5" fill="none"/>
+  <path d="M12.5 17.5L14 19" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- L -->
+  <path d="M17 9V19H22" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Search icon (small) -->
+  <circle cx="24" cy="8" r="2.5" stroke="white" stroke-width="1" fill="none" opacity="0.8"/>
+  <path d="m26 10 1.5 1.5" stroke="white" stroke-width="1" stroke-linecap="round" opacity="0.8"/>
+
+  <!-- Parser brackets -->
+  <path d="M6 22L4 24L6 26" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+  <path d="M26 22L28 24L26 26" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+</svg>
