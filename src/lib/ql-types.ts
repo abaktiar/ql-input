@@ -138,6 +138,9 @@ export interface QLInputProps {
   placeholder?: string;
   disabled?: boolean;
   className?: string;
+  // Icon visibility controls
+  showSearchIcon?: boolean;
+  showClearIcon?: boolean;
   // Async value suggestions
   getAsyncValueSuggestions?: (field: string, typedValue: string) => Promise<QLValue[]>;
   // Predefined value suggestions

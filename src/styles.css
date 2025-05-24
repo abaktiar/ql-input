@@ -1,22 +1,65 @@
-/* QL Input Component Styles */
+/* QL Input Component Styles - Framework Independent */
 
 :root {
-  --ql-input-border: hsl(214.3 31.8% 91.4%);
-  --ql-input-background: hsl(0 0% 100%);
-  --ql-input-foreground: hsl(222.2 84% 4.9%);
-  --ql-input-muted: hsl(210 40% 96%);
-  --ql-input-muted-foreground: hsl(215.4 16.3% 46.9%);
-  --ql-input-ring: hsl(222.2 84% 4.9%);
-  --ql-input-radius: 0.5rem;
+  /* Light theme colors */
+  --ql-input-border: #e2e8f0;
+  --ql-input-background: #ffffff;
+  --ql-input-foreground: #1a202c;
+  --ql-input-muted: #f7fafc;
+  --ql-input-muted-foreground: #718096;
+  --ql-input-ring: #3182ce;
+  --ql-input-destructive: #e53e3e;
+  --ql-input-success: #38a169;
+  --ql-input-warning: #d69e2e;
+
+  /* Spacing and sizing */
+  --ql-input-radius: 0.375rem;
+  --ql-input-radius-lg: 0.5rem;
+  --ql-input-spacing-xs: 0.25rem;
+  --ql-input-spacing-sm: 0.5rem;
+  --ql-input-spacing-md: 0.75rem;
+  --ql-input-spacing-lg: 1rem;
+
+  /* Typography */
+  --ql-input-font-size-sm: 0.875rem;
+  --ql-input-font-size-base: 1rem;
+  --ql-input-line-height: 1.5;
+
+  /* Shadows */
+  --ql-input-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --ql-input-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --ql-input-shadow-focus: 0 0 0 3px rgba(49, 130, 206, 0.1);
+
+  /* Transitions */
+  --ql-input-transition: all 0.2s ease-in-out;
 }
 
-.dark {
-  --ql-input-border: hsl(217.2 32.6% 17.5%);
-  --ql-input-background: hsl(222.2 84% 4.9%);
-  --ql-input-foreground: hsl(210 40% 98%);
-  --ql-input-muted: hsl(217.2 32.6% 17.5%);
-  --ql-input-muted-foreground: hsl(215 20.2% 65.1%);
-  --ql-input-ring: hsl(212.7 26.8% 83.9%);
+/* Dark theme */
+.ql-dark,
+.dark .ql-input-container,
+[data-theme="dark"] .ql-input-container {
+  --ql-input-border: #4a5568;
+  --ql-input-background: #2d3748;
+  --ql-input-foreground: #f7fafc;
+  --ql-input-muted: #4a5568;
+  --ql-input-muted-foreground: #a0aec0;
+  --ql-input-ring: #63b3ed;
+  --ql-input-destructive: #fc8181;
+  --ql-input-success: #68d391;
+  --ql-input-warning: #f6e05e;
+}
+
+/* Container for the entire QL Input component */
+.ql-input-container {
+  position: relative;
+  width: 100%;
+}
+
+/* Main input wrapper */
+.ql-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 /* Base input styles */
@@ -27,86 +70,776 @@
   border-radius: var(--ql-input-radius);
   border: 1px solid var(--ql-input-border);
   background-color: var(--ql-input-background);
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
+  padding: var(--ql-input-spacing-sm) var(--ql-input-spacing-md);
+  padding-left: 2.5rem; /* Space for search icon */
+  padding-right: 2.5rem; /* Space for clear/loading icon */
+  font-size: var(--ql-input-font-size-sm);
+  line-height: var(--ql-input-line-height);
   color: var(--ql-input-foreground);
-  transition: all 0.2s ease-in-out;
+  transition: var(--ql-input-transition);
+  box-shadow: var(--ql-input-shadow-sm);
+}
+
+/* Adjust padding when search icon is not shown */
+.ql-input-container:not(:has(.ql-input-icon--search)) .ql-input {
+  padding-left: var(--ql-input-spacing-md);
+}
+
+/* Adjust padding when clear icon is not shown */
+.ql-input-container:not(:has(.ql-input-icon--clear)):not(:has(.ql-input-icon--loading)) .ql-input {
+  padding-right: var(--ql-input-spacing-md);
 }
 
 .ql-input:focus {
   outline: none;
   border-color: var(--ql-input-ring);
-  box-shadow: 0 0 0 2px var(--ql-input-ring);
+  box-shadow: var(--ql-input-shadow-focus);
 }
 
 .ql-input:disabled {
   cursor: not-allowed;
   opacity: 0.5;
+  background-color: var(--ql-input-muted);
 }
 
 .ql-input::placeholder {
   color: var(--ql-input-muted-foreground);
 }
 
-/* Suggestion popover styles */
-.ql-suggestions {
-  background-color: var(--ql-input-background);
-  border: 1px solid var(--ql-input-border);
-  border-radius: var(--ql-input-radius);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  max-height: 300px;
-  overflow-y: auto;
-  z-index: 50;
+/* Input states */
+.ql-input.ql-input--valid {
+  border-color: var(--ql-input-success);
+  box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.1);
 }
 
-.ql-suggestion-item {
-  padding: 0.5rem 0.75rem;
-  cursor: pointer;
-  color: var(--ql-input-foreground);
-  transition: background-color 0.2s ease-in-out;
+.ql-input.ql-input--invalid {
+  border-color: var(--ql-input-destructive);
+  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
 }
 
-.ql-suggestion-item:hover,
-.ql-suggestion-item[data-selected="true"] {
-  background-color: var(--ql-input-muted);
+.ql-input.ql-input--suggestions {
+  border-color: var(--ql-input-ring);
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
 }
 
-.ql-suggestion-item[data-disabled="true"] {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Validation states */
-.ql-input[data-valid="false"] {
-  border-color: hsl(0 84.2% 60.2%);
-  box-shadow: 0 0 0 2px hsl(0 84.2% 60.2% / 0.2);
-}
-
-.ql-input[data-suggestions="true"] {
-  border-color: hsl(221.2 83.2% 53.3%);
-  box-shadow: 0 0 0 2px hsl(221.2 83.2% 53.3% / 0.2);
-}
-
-/* Loading state */
-.ql-input-loading {
-  position: relative;
-}
-
-.ql-input-loading::after {
-  content: '';
+/* Icons */
+.ql-input-icon {
   position: absolute;
-  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
   width: 1rem;
   height: 1rem;
-  border: 2px solid var(--ql-input-muted-foreground);
-  border-top: 2px solid var(--ql-input-ring);
-  border-radius: 50%;
+  color: var(--ql-input-muted-foreground);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ql-input-icon--search {
+  left: var(--ql-input-spacing-md);
+}
+
+.ql-input-icon--clear {
+  right: var(--ql-input-spacing-md);
+  cursor: pointer;
+  pointer-events: auto;
+  color: var(--ql-input-muted-foreground);
+  transition: var(--ql-input-transition);
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ql-input-icon--clear:hover {
+  color: var(--ql-input-foreground);
+}
+
+.ql-input-icon--loading {
+  right: var(--ql-input-spacing-md);
   animation: ql-spin 1s linear infinite;
 }
 
+/* SVG Icons (embedded) */
+.ql-icon-search {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ql-icon-x {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  display: block;
+}
+
+.ql-icon-loader {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Suggestion popover */
+.ql-suggestions-popover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 50;
+  margin-top: var(--ql-input-spacing-xs);
+  min-width: 300px;
+  max-width: 500px;
+  width: max-content;
+}
+
+.ql-suggestions {
+  background-color: var(--ql-input-background);
+  border: 1px solid var(--ql-input-border);
+  border-radius: var(--ql-input-radius);
+  box-shadow: var(--ql-input-shadow-md);
+  max-height: 300px;
+  overflow-y: auto;
+  padding: var(--ql-input-spacing-xs);
+}
+
+.ql-suggestion-item {
+  display: flex;
+  align-items: center;
+  padding: var(--ql-input-spacing-sm) var(--ql-input-spacing-md);
+  cursor: pointer;
+  color: var(--ql-input-foreground);
+  border-radius: var(--ql-input-radius);
+  transition: var(--ql-input-transition);
+  font-size: var(--ql-input-font-size-sm);
+  line-height: var(--ql-input-line-height);
+}
+
+.ql-suggestion-item:hover,
+.ql-suggestion-item.ql-suggestion-item--selected {
+  background-color: var(--ql-input-muted);
+}
+
+.ql-suggestion-item.ql-suggestion-item--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ql-suggestion-item__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ql-suggestion-item__label {
+  font-weight: 500;
+  color: var(--ql-input-foreground);
+}
+
+.ql-suggestion-item__description {
+  font-size: 0.75rem;
+  color: var(--ql-input-muted-foreground);
+  margin-top: 0.125rem;
+}
+
+.ql-suggestions-empty {
+  padding: var(--ql-input-spacing-lg);
+  text-align: center;
+  color: var(--ql-input-muted-foreground);
+  font-size: var(--ql-input-font-size-sm);
+}
+
+/* Button styles */
+.ql-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ql-input-spacing-sm);
+  white-space: nowrap;
+  border-radius: var(--ql-input-radius);
+  font-size: var(--ql-input-font-size-sm);
+  font-weight: 500;
+  transition: var(--ql-input-transition);
+  cursor: pointer;
+  border: none;
+  outline: none;
+  text-decoration: none;
+  padding: var(--ql-input-spacing-sm) var(--ql-input-spacing-lg);
+  height: 2.25rem;
+}
+
+.ql-button:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.ql-button:focus-visible {
+  box-shadow: var(--ql-input-shadow-focus);
+}
+
+.ql-button--primary {
+  background-color: var(--ql-input-ring);
+  color: white;
+}
+
+.ql-button--primary:hover:not(:disabled) {
+  background-color: #2c5aa0;
+}
+
+.ql-button--secondary {
+  background-color: var(--ql-input-muted);
+  color: var(--ql-input-foreground);
+  border: 1px solid var(--ql-input-border);
+}
+
+.ql-button--secondary:hover:not(:disabled) {
+  background-color: var(--ql-input-border);
+}
+
+.ql-button--ghost {
+  background-color: transparent;
+  color: var(--ql-input-foreground);
+}
+
+.ql-button--ghost:hover:not(:disabled) {
+  background-color: var(--ql-input-muted);
+}
+
+/* Animations */
 @keyframes ql-spin {
-  0% { transform: translateY(-50%) rotate(0deg); }
-  100% { transform: translateY(-50%) rotate(360deg); }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes ql-fade-in {
+  0% { opacity: 0; transform: translateY(-4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ql-fade-out {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+
+.ql-fade-in {
+  animation: ql-fade-in 0.15s ease-out;
+}
+
+.ql-fade-out {
+  animation: ql-fade-out 0.15s ease-in;
+}
+
+/* Suggestion type badges */
+.ql-suggestion-type {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--ql-input-radius);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.ql-suggestion-type--field {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.ql-suggestion-type--operator {
+  background-color: #e9d5ff;
+  color: #7c3aed;
+}
+
+.ql-suggestion-type--value {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.ql-suggestion-type--logical {
+  background-color: #fed7aa;
+  color: #ea580c;
+}
+
+.ql-suggestion-type--keyword {
+  background-color: #e0e7ff;
+  color: #4338ca;
+}
+
+.ql-suggestion-type--function {
+  background-color: #cffafe;
+  color: #0891b2;
+}
+
+.ql-suggestion-type--parenthesis,
+.ql-suggestion-type--comma {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+/* Dark theme suggestion types */
+.ql-dark .ql-suggestion-type--field,
+.dark .ql-input-container .ql-suggestion-type--field,
+[data-theme="dark"] .ql-input-container .ql-suggestion-type--field {
+  background-color: #1e3a8a;
+  color: #93c5fd;
+}
+
+.ql-dark .ql-suggestion-type--operator,
+.dark .ql-input-container .ql-suggestion-type--operator,
+[data-theme="dark"] .ql-input-container .ql-suggestion-type--operator {
+  background-color: #581c87;
+  color: #c4b5fd;
+}
+
+.ql-dark .ql-suggestion-type--value,
+.dark .ql-input-container .ql-suggestion-type--value,
+[data-theme="dark"] .ql-input-container .ql-suggestion-type--value {
+  background-color: #064e3b;
+  color: #6ee7b7;
+}
+
+.ql-dark .ql-suggestion-type--logical,
+.dark .ql-input-container .ql-suggestion-type--logical,
+[data-theme="dark"] .ql-input-container .ql-suggestion-type--logical {
+  background-color: #9a3412;
+  color: #fdba74;
+}
+
+.ql-dark .ql-suggestion-type--keyword,
+.dark .ql-input-container .ql-suggestion-type--keyword,
+[data-theme="dark"] .ql-input-container .ql-suggestion-type--keyword {
+  background-color: #312e81;
+  color: #a5b4fc;
+}
+
+.ql-dark .ql-suggestion-type--function,
+.dark .ql-input-container .ql-suggestion-type--function,
+[data-theme="dark"] .ql-input-container .ql-suggestion-type--function {
+  background-color: #164e63;
+  color: #67e8f9;
+}
+
+.ql-dark .ql-suggestion-type--parenthesis,
+.ql-dark .ql-suggestion-type--comma,
+.dark .ql-input-container .ql-suggestion-type--parenthesis,
+.dark .ql-input-container .ql-suggestion-type--comma,
+[data-theme="dark"] .ql-input-container .ql-suggestion-type--parenthesis,
+[data-theme="dark"] .ql-input-container .ql-suggestion-type--comma {
+  background-color: #374151;
+  color: #d1d5db;
+}
+
+/* Validation error */
+.ql-validation-error {
+  margin-top: var(--ql-input-spacing-xs);
+  font-size: 0.75rem;
+  color: var(--ql-input-destructive);
+  line-height: 1.25;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .ql-input {
+    font-size: 1rem; /* Prevent zoom on iOS */
+  }
+
+  .ql-suggestions {
+    max-height: 200px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .ql-input {
+    border-width: 2px;
+  }
+
+  .ql-input:focus {
+    border-width: 3px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .ql-input,
+  .ql-suggestion-item,
+  .ql-button,
+  .ql-input-icon--clear {
+    transition: none;
+  }
+
+  .ql-input-icon--loading {
+    animation: none;
+  }
+
+  .ql-fade-in,
+  .ql-fade-out {
+    animation: none;
+  }
+}
+
+/* Demo App Styles */
+.demo-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.demo-section {
+  margin-bottom: 2rem;
+}
+
+.demo-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--ql-input-foreground);
+}
+
+.demo-description {
+  color: var(--ql-input-muted-foreground);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.demo-form-group {
+  margin-bottom: 1rem;
+}
+
+.demo-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ql-input-foreground);
+}
+
+.demo-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.demo-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-weight: 500;
+}
+
+.demo-status-badge--valid {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.demo-status-badge--invalid {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.demo-status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.demo-status-dot--valid {
+  background-color: #10b981;
+}
+
+.demo-status-dot--invalid {
+  background-color: #ef4444;
+}
+
+.demo-controls {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid var(--ql-input-border);
+  border-radius: var(--ql-input-radius);
+  background-color: var(--ql-input-muted);
+}
+
+.demo-controls-group {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.demo-controls-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ql-input-foreground);
+}
+
+.demo-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--ql-input-foreground);
+  cursor: pointer;
+}
+
+.demo-checkbox input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.demo-examples {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.demo-examples-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ql-input-foreground);
+}
+
+.demo-example-button {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--ql-input-border);
+  border-radius: var(--ql-input-radius);
+  background-color: var(--ql-input-background);
+  color: var(--ql-input-foreground);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: var(--ql-input-transition);
+}
+
+.demo-example-button:hover {
+  background-color: var(--ql-input-muted);
+}
+
+.demo-output-section {
+  margin-top: 2rem;
+}
+
+.demo-output-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--ql-input-foreground);
+}
+
+.demo-output-card {
+  padding: 1rem;
+  border-radius: var(--ql-input-radius-lg);
+  border: 1px solid var(--ql-input-border);
+  margin-bottom: 1rem;
+}
+
+.demo-output-card--blue {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.demo-output-card--green {
+  background-color: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.demo-output-card--purple {
+  background-color: #faf5ff;
+  border-color: #d8b4fe;
+}
+
+.demo-output-card--gray {
+  background-color: var(--ql-input-muted);
+  border-color: var(--ql-input-border);
+}
+
+.demo-output-description {
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.demo-output-description--blue {
+  color: #1e40af;
+}
+
+.demo-output-description--green {
+  color: #166534;
+}
+
+.demo-output-description--purple {
+  color: #7c3aed;
+}
+
+.demo-output-description--gray {
+  color: var(--ql-input-muted-foreground);
+}
+
+.demo-output-pre {
+  font-size: 0.875rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.demo-output-pre--blue {
+  color: #1d4ed8;
+}
+
+.demo-output-pre--green {
+  color: #15803d;
+}
+
+.demo-output-pre--purple {
+  color: #8b5cf6;
+}
+
+.demo-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .demo-grid--2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 768px) {
+  .demo-grid--3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.demo-features-section {
+  margin-top: 2rem;
+}
+
+.demo-features-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--ql-input-foreground);
+}
+
+.demo-feature-group {
+  margin-bottom: 1rem;
+}
+
+.demo-feature-group-title {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--ql-input-foreground);
+}
+
+.demo-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.demo-feature-item {
+  font-size: 0.875rem;
+  color: var(--ql-input-muted-foreground);
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+
+.demo-kbd {
+  display: inline-block;
+  padding: 0.125rem 0.25rem;
+  background-color: var(--ql-input-muted);
+  border-radius: var(--ql-input-radius);
+  font-size: 0.75rem;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  border: 1px solid var(--ql-input-border);
+}
+
+/* Dark theme adjustments for demo */
+.ql-dark .demo-output-card--blue,
+.dark .demo-container .demo-output-card--blue,
+[data-theme="dark"] .demo-container .demo-output-card--blue {
+  background-color: #1e3a8a;
+  border-color: #3b82f6;
+}
+
+.ql-dark .demo-output-card--green,
+.dark .demo-container .demo-output-card--green,
+[data-theme="dark"] .demo-container .demo-output-card--green {
+  background-color: #14532d;
+  border-color: #22c55e;
+}
+
+.ql-dark .demo-output-card--purple,
+.dark .demo-container .demo-output-card--purple,
+[data-theme="dark"] .demo-container .demo-output-card--purple {
+  background-color: #581c87;
+  border-color: #a855f7;
+}
+
+.ql-dark .demo-output-description--blue,
+.dark .demo-container .demo-output-description--blue,
+[data-theme="dark"] .demo-container .demo-output-description--blue {
+  color: #93c5fd;
+}
+
+.ql-dark .demo-output-description--green,
+.dark .demo-container .demo-output-description--green,
+[data-theme="dark"] .demo-container .demo-output-description--green {
+  color: #86efac;
+}
+
+.ql-dark .demo-output-description--purple,
+.dark .demo-container .demo-output-description--purple,
+[data-theme="dark"] .demo-container .demo-output-description--purple {
+  color: #c4b5fd;
+}
+
+.ql-dark .demo-output-pre--blue,
+.dark .demo-container .demo-output-pre--blue,
+[data-theme="dark"] .demo-container .demo-output-pre--blue {
+  color: #bfdbfe;
+}
+
+.ql-dark .demo-output-pre--green,
+.dark .demo-container .demo-output-pre--green,
+[data-theme="dark"] .demo-container .demo-output-pre--green {
+  color: #bbf7d0;
+}
+
+.ql-dark .demo-output-pre--purple,
+.dark .demo-container .demo-output-pre--purple,
+[data-theme="dark"] .demo-container .demo-output-pre--purple {
+  color: #ddd6fe;
+}
+
+.ql-dark .demo-status-badge--valid,
+.dark .demo-container .demo-status-badge--valid,
+[data-theme="dark"] .demo-container .demo-status-badge--valid {
+  background-color: #14532d;
+  color: #86efac;
+}
+
+.ql-dark .demo-status-badge--invalid,
+.dark .demo-container .demo-status-badge--invalid,
+[data-theme="dark"] .demo-container .demo-status-badge--invalid {
+  background-color: #7f1d1d;
+  color: #fca5a5;
 }

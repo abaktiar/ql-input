@@ -1,7 +1,7 @@
 {
   "name": "@abaktiar/ql-input",
-  "version": "1.0.1",
-  "description": "React QL input component with intelligent autocomplete, syntax highlighting, and query validation. Built with TypeScript and shadcn/ui components.",
+  "version": "1.2.0",
+  "description": "React QL input component with intelligent autocomplete, syntax highlighting, and query validation. Framework-independent with zero external dependencies.",
   "main": "./index.js",
   "module": "./index.mjs",
   "types": "./index.d.ts",
@@ -44,13 +44,7 @@
     "react-dom": ">=18.0.0"
   },
   "dependencies": {
-    "@radix-ui/react-popover": "^1.1.3",
-    "@radix-ui/react-slot": "^1.2.3",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "cmdk": "^1.0.4",
-    "lucide-react": "^0.511.0",
-    "tailwind-merge": "^3.3.0"
+    "clsx": "^2.1.1"
   },
   "sideEffects": ["*.css"]
 }

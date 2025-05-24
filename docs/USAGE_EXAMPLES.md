@@ -51,7 +51,7 @@ function App() {
 
   const handleQueryChange = (value: string, parsedQuery: QLQuery) => {
     setQuery(value);
-    
+
     if (parsedQuery.valid) {
       console.log('Valid query:', parsedQuery);
       // Convert to your backend query format
@@ -68,6 +68,8 @@ function App() {
       onChange={handleQueryChange}
       config={config}
       placeholder="Search issues... (e.g., project = PROJ1 AND status = Open)"
+      showSearchIcon={true}  // Optional: default is true
+      showClearIcon={true}   // Optional: default is true
     />
   );
 }
@@ -153,18 +155,18 @@ total > 1000 AND status != Cancelled
 ```typescript
 function convertToMongoQuery(qlQuery: QLQuery) {
   const mongoQuery: any = {};
-  
+
   if (qlQuery.where) {
     mongoQuery.where = convertExpression(qlQuery.where);
   }
-  
+
   if (qlQuery.orderBy && qlQuery.orderBy.length > 0) {
     mongoQuery.sort = {};
     qlQuery.orderBy.forEach(order => {
       mongoQuery.sort[order.field] = order.direction === 'DESC' ? -1 : 1;
     });
   }
-  
+
   return mongoQuery;
 }
 
@@ -178,7 +180,7 @@ function convertExpression(expr: QLExpression): any {
   } else {
     // Single condition
     const condition: any = {};
-    
+
     switch (expr.operator) {
       case '=':
         condition[expr.field] = expr.value;
@@ -193,11 +195,11 @@ function convertExpression(expr: QLExpression): any {
         condition[expr.field] = { $nin: expr.value };
         break;
     }
-    
+
     if (expr.not) {
       return { $not: condition };
     }
-    
+
     return condition;
   }
 }
@@ -214,26 +216,26 @@ const mongoQuery = convertToMongoQuery(qlQuery);
 function convertToSQL(qlQuery: QLQuery): { sql: string; params: any[] } {
   let sql = 'SELECT * FROM issues';
   const params: any[] = [];
-  
+
   if (qlQuery.where) {
     const { clause, whereParams } = convertExpressionToSQL(qlQuery.where);
     sql += ` WHERE ${clause}`;
     params.push(...whereParams);
   }
-  
+
   if (qlQuery.orderBy && qlQuery.orderBy.length > 0) {
-    const orderClauses = qlQuery.orderBy.map(order => 
+    const orderClauses = qlQuery.orderBy.map(order =>
       `${order.field} ${order.direction}`
     );
     sql += ` ORDER BY ${orderClauses.join(', ')}`;
   }
-  
+
   return { sql, params };
 }
 
 function convertExpressionToSQL(expr: QLExpression): { clause: string; whereParams: any[] } {
   const params: any[] = [];
-  
+
   if ('conditions' in expr) {
     // Logical group
     const subclauses = expr.conditions.map(condition => {
@@ -241,19 +243,19 @@ function convertExpressionToSQL(expr: QLExpression): { clause: string; wherePara
       params.push(...whereParams);
       return clause;
     });
-    
+
     const operator = expr.operator === 'AND' ? ' AND ' : ' OR ';
     let clause = `(${subclauses.join(operator)})`;
-    
+
     if (expr.not) {
       clause = `NOT ${clause}`;
     }
-    
+
     return { clause, whereParams: params };
   } else {
     // Single condition
     let clause = '';
-    
+
     switch (expr.operator) {
       case '=':
         clause = `${expr.field} = ?`;
@@ -274,11 +276,11 @@ function convertExpressionToSQL(expr: QLExpression): { clause: string; wherePara
         params.push(...(expr.value as string[]));
         break;
     }
-    
+
     if (expr.not) {
       clause = `NOT (${clause})`;
     }
-    
+
     return { clause, whereParams: params };
   }
 }
@@ -286,7 +288,7 @@ function convertExpressionToSQL(expr: QLExpression): { clause: string; wherePara
 // Usage
 const qlQuery = parser.parse('project = PROJ1 AND status IN (Open, "In Progress") ORDER BY priority DESC');
 const { sql, params } = convertToSQL(qlQuery);
-// Result: 
+// Result:
 // sql: "SELECT * FROM issues WHERE (project = ? AND status IN (?, ?)) ORDER BY priority DESC"
 // params: ["PROJ1", "Open", "In Progress"]
 ```
@@ -318,6 +320,38 @@ const { sql, params } = convertToSQL(qlQuery);
 }
 ```
 
+### **Icon Customization**
+
+```tsx
+// Minimal design without search icon
+<QLInput
+  value={query}
+  onChange={handleQueryChange}
+  config={config}
+  showSearchIcon={false}
+  placeholder="Enter query..."
+/>
+
+// Prevent accidental clearing
+<QLInput
+  value={query}
+  onChange={handleQueryChange}
+  config={config}
+  showClearIcon={false}
+  placeholder="Enter query..."
+/>
+
+// Ultra-minimal design
+<QLInput
+  value={query}
+  onChange={handleQueryChange}
+  config={config}
+  showSearchIcon={false}
+  showClearIcon={false}
+  placeholder="Enter query..."
+/>
+```
+
 ### **Custom Styling Example**
 
 ```tsx
@@ -326,6 +360,8 @@ const { sql, params } = convertToSQL(qlQuery);
   onChange={handleQueryChange}
   config={config}
   className="my-custom-ql-input"
+  showSearchIcon={true}
+  showClearIcon={true}
   style={{
     minHeight: '40px',
     fontSize: '14px',
@@ -345,18 +381,18 @@ import { QLParser } from './ql-parser';
 
 describe('My QL Implementation', () => {
   const parser = new QLParser(myConfig);
-  
+
   test('should parse my specific queries', () => {
     const result = parser.parse('project = PROJ1 AND status = Open');
-    
+
     expect(result.valid).toBe(true);
     expect(result.where.operator).toBe('AND');
     expect(result.where.conditions).toHaveLength(2);
   });
-  
+
   test('should handle my custom fields', () => {
     const result = parser.parse('customField = "custom value"');
-    
+
     expect(result.valid).toBe(true);
     expect(result.where.field).toBe('customField');
     expect(result.where.value).toBe('custom value');
@@ -372,7 +408,7 @@ import { QLInput } from './ql-input';
 
 test('should build query through user interaction', async () => {
   const handleChange = jest.fn();
-  
+
   render(
     <QLInput
       value=""
@@ -380,15 +416,15 @@ test('should build query through user interaction', async () => {
       config={myConfig}
     />
   );
-  
+
   const input = screen.getByRole('textbox');
-  
+
   // Type and select suggestions
   fireEvent.change(input, { target: { value: 'proj' } });
   fireEvent.click(screen.getByText('project'));
   fireEvent.click(screen.getByText('='));
   fireEvent.click(screen.getByText('PROJ1'));
-  
+
   expect(handleChange).toHaveBeenCalledWith(
     'project = PROJ1 ',
     expect.objectContaining({

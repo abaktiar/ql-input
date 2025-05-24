@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { QLInput } from './ui/ql-input';
-import { Button } from './ui/button';
 import type { QLInputConfig, QLQuery, QLValue, QLField, QLFunction } from '@/lib/ql-types';
 import { toMongooseQuery, toSQLQuery, printExpression, countConditions } from '@/lib/ql-query-builder';
 
@@ -167,6 +166,8 @@ export function QLDemo() {
   const [query, setQuery] = useState('');
   const [parsedQuery, setParsedQuery] = useState<QLQuery | null>(null);
   const [executedQuery, setExecutedQuery] = useState<QLQuery | null>(null);
+  const [showSearchIcon, setShowSearchIcon] = useState(true);
+  const [showClearIcon, setShowClearIcon] = useState(true);
 
   // Mock async user suggestions
   const getAsyncValueSuggestions = async (field: string, typedValue: string): Promise<QLValue[]> => {
@@ -204,30 +205,32 @@ export function QLDemo() {
   ];
 
   return (
-    <div className='space-y-6'>
+    <div className='demo-section'>
       <div>
-        <h2 className='text-2xl font-bold mb-4'>QL Input Component Demo</h2>
-        <p className='text-muted-foreground mb-6'>
+        <h2 className='demo-title'>QL Input Component Demo</h2>
+        <p className='demo-description'>
           A comprehensive QL (Query Language) input component with autocomplete, syntax highlighting, and validation.
         </p>
       </div>
 
-      <div className='space-y-4'>
-        <div>
-          <div className='flex items-center justify-between mb-2'>
-            <label className='text-sm font-medium'>QL Query</label>
+      <div className='demo-section'>
+        <div className='demo-form-group'>
+          <div className='demo-label'>
+            <label>QL Query</label>
             {parsedQuery && (
-              <div className='flex items-center gap-2 text-xs'>
+              <div className='demo-status'>
                 <div
-                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-full ${
-                    parsedQuery.valid
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                      : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                  className={`demo-status-badge ${
+                    parsedQuery.valid ? 'demo-status-badge--valid' : 'demo-status-badge--invalid'
                   }`}>
-                  <div className={`w-2 h-2 rounded-full ${parsedQuery.valid ? 'bg-green-500' : 'bg-red-500'}`} />
+                  <div
+                    className={`demo-status-dot ${
+                      parsedQuery.valid ? 'demo-status-dot--valid' : 'demo-status-dot--invalid'
+                    }`}
+                  />
                   {parsedQuery.valid ? 'Valid' : 'Invalid'}
                 </div>
-                <span className='text-muted-foreground'>
+                <span className='demo-status'>
                   {parsedQuery.where ? countConditions(parsedQuery.where) : 0} condition
                   {(parsedQuery.where ? countConditions(parsedQuery.where) : 0) !== 1 ? 's' : ''}
                 </span>
@@ -241,36 +244,49 @@ export function QLDemo() {
             config={config}
             getAsyncValueSuggestions={getAsyncValueSuggestions}
             placeholder='Enter your QL query here...'
-            className='w-full'
+            showSearchIcon={showSearchIcon}
+            showClearIcon={showClearIcon}
           />
         </div>
 
-        <div className='flex gap-2 flex-wrap'>
-          <span className='text-sm font-medium'>Try these examples:</span>
+        <div className='demo-controls'>
+          <div className='demo-controls-group'>
+            <span className='demo-controls-label'>Icon Visibility:</span>
+            <label className='demo-checkbox'>
+              <input type='checkbox' checked={showSearchIcon} onChange={(e) => setShowSearchIcon(e.target.checked)} />
+              <span>Show Search Icon</span>
+            </label>
+            <label className='demo-checkbox'>
+              <input type='checkbox' checked={showClearIcon} onChange={(e) => setShowClearIcon(e.target.checked)} />
+              <span>Show Clear Icon</span>
+            </label>
+          </div>
+        </div>
+
+        <div className='demo-examples'>
+          <span className='demo-examples-label'>Try these examples:</span>
           {sampleQueries.map((sampleQuery, index) => (
-            <Button key={index} variant='outline' size='sm' onClick={() => setQuery(sampleQuery)}>
+            <button key={index} className='demo-example-button' onClick={() => setQuery(sampleQuery)}>
               {sampleQuery}
-            </Button>
+            </button>
           ))}
         </div>
       </div>
 
       {parsedQuery && (
-        <div className='space-y-4'>
+        <div className='demo-output-section'>
           <div>
-            <h3 className='text-lg font-semibold mb-2'>🌳 Query Structure</h3>
-            <div className='bg-blue-50 dark:bg-blue-950 p-4 rounded-lg border border-blue-200 dark:border-blue-800'>
+            <h3 className='demo-output-title'>🌳 Query Structure</h3>
+            <div className='demo-output-card demo-output-card--blue'>
               {parsedQuery.where ? (
                 <div>
-                  <p className='text-sm text-blue-800 dark:text-blue-200 mb-2'>
+                  <p className='demo-output-description demo-output-description--blue'>
                     Hierarchical structure perfect for database queries! 🎯
                   </p>
-                  <pre className='text-sm overflow-x-auto text-blue-700 dark:text-blue-300'>
-                    {printExpression(parsedQuery.where)}
-                  </pre>
+                  <pre className='demo-output-pre demo-output-pre--blue'>{printExpression(parsedQuery.where)}</pre>
                 </div>
               ) : (
-                <p className='text-sm text-blue-600 dark:text-blue-400'>
+                <p className='demo-output-description demo-output-description--blue'>
                   No hierarchical structure available (simple query)
                 </p>
               )}
@@ -280,13 +296,13 @@ export function QLDemo() {
           {/* Database Query Conversion */}
           {parsedQuery.where && (
             <div>
-              <h3 className='text-lg font-semibold mb-2'>🔄 Database Query Conversion</h3>
-              <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
+              <h3 className='demo-output-title'>🔄 Database Query Conversion</h3>
+              <div className='demo-grid demo-grid--2'>
                 {/* Mongoose Query */}
                 <div>
-                  <h4 className='text-md font-medium mb-2'>🍃 Mongoose Query</h4>
-                  <div className='bg-green-50 dark:bg-green-950 p-4 rounded-lg border border-green-200 dark:border-green-800'>
-                    <pre className='text-xs overflow-x-auto text-green-700 dark:text-green-300'>
+                  <h4 className='demo-output-title'>🍃 Mongoose Query</h4>
+                  <div className='demo-output-card demo-output-card--green'>
+                    <pre className='demo-output-pre demo-output-pre--green'>
                       {JSON.stringify(toMongooseQuery(parsedQuery.where), null, 2)}
                     </pre>
                   </div>
@@ -294,11 +310,9 @@ export function QLDemo() {
 
                 {/* SQL Query */}
                 <div>
-                  <h4 className='text-md font-medium mb-2'>🗄️ SQL WHERE Clause</h4>
-                  <div className='bg-purple-50 dark:bg-purple-950 p-4 rounded-lg border border-purple-200 dark:border-purple-800'>
-                    <pre className='text-xs overflow-x-auto text-purple-700 dark:text-purple-300'>
-                      WHERE {toSQLQuery(parsedQuery.where)}
-                    </pre>
+                  <h4 className='demo-output-title'>🗄️ SQL WHERE Clause</h4>
+                  <div className='demo-output-card demo-output-card--purple'>
+                    <pre className='demo-output-pre demo-output-pre--purple'>WHERE {toSQLQuery(parsedQuery.where)}</pre>
                   </div>
                 </div>
               </div>
@@ -307,9 +321,9 @@ export function QLDemo() {
 
           {/* Raw Parsed Query */}
           <div>
-            <h3 className='text-lg font-semibold mb-2'>📄 Complete Parsed Query</h3>
-            <div className='bg-muted p-4 rounded-lg'>
-              <pre className='text-sm overflow-x-auto' data-testid='parse-result'>
+            <h3 className='demo-output-title'>📄 Complete Parsed Query</h3>
+            <div className='demo-output-card demo-output-card--gray'>
+              <pre className='demo-output-pre' data-testid='parse-result'>
                 {JSON.stringify(parsedQuery, null, 2)}
               </pre>
             </div>
@@ -318,61 +332,59 @@ export function QLDemo() {
       )}
 
       {executedQuery && (
-        <div className='space-y-4'>
+        <div className='demo-output-section'>
           <div>
-            <h3 className='text-lg font-semibold mb-2'>Executed Query</h3>
-            <div className='bg-green-50 dark:bg-green-950 p-4 rounded-lg border border-green-200 dark:border-green-800'>
-              <p className='text-sm text-green-800 dark:text-green-200 mb-2'>Query executed successfully!</p>
-              <pre className='text-sm overflow-x-auto text-green-700 dark:text-green-300'>
-                {JSON.stringify(executedQuery, null, 2)}
-              </pre>
+            <h3 className='demo-output-title'>Executed Query</h3>
+            <div className='demo-output-card demo-output-card--green'>
+              <p className='demo-output-description demo-output-description--green'>Query executed successfully!</p>
+              <pre className='demo-output-pre demo-output-pre--green'>{JSON.stringify(executedQuery, null, 2)}</pre>
             </div>
           </div>
         </div>
       )}
 
-      <div className='space-y-4'>
-        <h3 className='text-lg font-semibold'>Features Demonstrated</h3>
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-          <div className='space-y-2'>
-            <h4 className='font-medium'>✅ Core Features</h4>
-            <ul className='text-sm space-y-1 text-muted-foreground'>
-              <li>• Context-aware autocomplete</li>
-              <li>• Field, operator, and value suggestions</li>
-              <li>• Parentheses grouping support</li>
-              <li>• ORDER BY clause support</li>
-              <li>• Query parsing and validation</li>
-              <li>• Visual feedback for query status</li>
+      <div className='demo-features-section'>
+        <h3 className='demo-features-title'>Features Demonstrated</h3>
+        <div className='demo-grid demo-grid--3'>
+          <div className='demo-feature-group'>
+            <h4 className='demo-feature-group-title'>✅ Core Features</h4>
+            <ul className='demo-feature-list'>
+              <li className='demo-feature-item'>• Context-aware autocomplete</li>
+              <li className='demo-feature-item'>• Field, operator, and value suggestions</li>
+              <li className='demo-feature-item'>• Parentheses grouping support</li>
+              <li className='demo-feature-item'>• ORDER BY clause support</li>
+              <li className='demo-feature-item'>• Query parsing and validation</li>
+              <li className='demo-feature-item'>• Visual feedback for query status</li>
             </ul>
           </div>
-          <div className='space-y-2'>
-            <h4 className='font-medium'>✅ Advanced Features</h4>
-            <ul className='text-sm space-y-1 text-muted-foreground'>
-              <li>• Async value suggestions (users)</li>
-              <li>• Function support (currentUser, now, etc.)</li>
-              <li>• Debounced API calls</li>
-              <li>• Dark mode support</li>
-              <li>• Responsive design</li>
-              <li>• Accessibility (ARIA attributes)</li>
+          <div className='demo-feature-group'>
+            <h4 className='demo-feature-group-title'>✅ Advanced Features</h4>
+            <ul className='demo-feature-list'>
+              <li className='demo-feature-item'>• Async value suggestions (users)</li>
+              <li className='demo-feature-item'>• Function support (currentUser, now, etc.)</li>
+              <li className='demo-feature-item'>• Debounced API calls</li>
+              <li className='demo-feature-item'>• Dark mode support</li>
+              <li className='demo-feature-item'>• Responsive design</li>
+              <li className='demo-feature-item'>• Accessibility (ARIA attributes)</li>
             </ul>
           </div>
-          <div className='space-y-2'>
-            <h4 className='font-medium'>⌨️ Keyboard Shortcuts</h4>
-            <ul className='text-sm space-y-1 text-muted-foreground'>
-              <li>
-                • <kbd className='px-1 py-0.5 bg-muted rounded text-xs'>↑↓</kbd> Navigate suggestions
+          <div className='demo-feature-group'>
+            <h4 className='demo-feature-group-title'>⌨️ Keyboard Shortcuts</h4>
+            <ul className='demo-feature-list'>
+              <li className='demo-feature-item'>
+                • <kbd className='demo-kbd'>↑↓</kbd> Navigate suggestions
               </li>
-              <li>
-                • <kbd className='px-1 py-0.5 bg-muted rounded text-xs'>Enter</kbd> Select suggestion
+              <li className='demo-feature-item'>
+                • <kbd className='demo-kbd'>Enter</kbd> Select suggestion
               </li>
-              <li>
-                • <kbd className='px-1 py-0.5 bg-muted rounded text-xs'>Tab</kbd> Accept suggestion
+              <li className='demo-feature-item'>
+                • <kbd className='demo-kbd'>Tab</kbd> Accept suggestion
               </li>
-              <li>
-                • <kbd className='px-1 py-0.5 bg-muted rounded text-xs'>Esc</kbd> Close suggestions
+              <li className='demo-feature-item'>
+                • <kbd className='demo-kbd'>Esc</kbd> Close suggestions
               </li>
-              <li>
-                • <kbd className='px-1 py-0.5 bg-muted rounded text-xs'>Enter</kbd> Execute query (no suggestions)
+              <li className='demo-feature-item'>
+                • <kbd className='demo-kbd'>Enter</kbd> Execute query (no suggestions)
               </li>
             </ul>
           </div>

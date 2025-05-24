@@ -1,0 +1,22 @@
+{
+  "name": "ql-parser-example",
+  "version": "1.0.0",
+  "description": "Example usage of @abaktiar/ql-parser in Node.js",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@abaktiar/ql-parser": "^1.2.0"
+  },
+  "keywords": [
+    "ql-parser",
+    "query-language",
+    "example",
+    "nodejs"
+  ],
+  "author": "abaktiar",
+  "license": "MIT"
+}

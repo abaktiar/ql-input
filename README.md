@@ -1,6 +1,6 @@
 # QL Input Component
 
-A comprehensive QL (Query Language) input component built with React, TypeScript, and shadcn/ui. Features intelligent autocomplete, syntax highlighting, query parsing, and validation.
+A comprehensive QL (Query Language) input component built with React and TypeScript. Features intelligent autocomplete, syntax highlighting, query parsing, and validation with customizable icon visibility.
 
 ![QL Input Demo](https://via.placeholder.com/800x400/1f2937/ffffff?text=QL+Input+Component+Demo)
 
@@ -13,6 +13,7 @@ A comprehensive QL (Query Language) input component built with React, TypeScript
 - 🔧 **Configurable fields** - Define custom fields, operators, and values
 - 📝 **Query parsing** - Complete QL query structure parsing
 - 🎯 **Parentheses grouping** - Support for complex condition grouping
+- 👁️ **Icon customization** - Control search and clear icon visibility
 
 ### Advanced Features
 - 🌐 **Async value suggestions** - Server-side value fetching with debouncing
@@ -92,6 +93,8 @@ function MyComponent() {
       config={config}
       getAsyncValueSuggestions={handleAsyncSuggestions}
       placeholder="Enter your QL query..."
+      showSearchIcon={true}  // Optional: default is true
+      showClearIcon={true}   // Optional: default is true
     />
   );
 }
@@ -162,17 +165,17 @@ src/
 ├── components/
 │   ├── ui/
 │   │   ├── ql-input.tsx       # Main QL input component
-│   │   ├── input.tsx          # Base input component
-│   │   ├── popover.tsx        # Suggestion popover
-│   │   └── command.tsx        # Command palette
+│   │   └── icons.tsx          # Icon components
 │   └── ql-demo.tsx            # Demo component
 ├── lib/
 │   ├── ql-types.ts            # TypeScript types
 │   ├── ql-parser.ts           # Query parser
-│   └── ql-suggestions.ts      # Suggestion engine
+│   ├── ql-suggestions.ts      # Suggestion engine
+│   └── utils.ts               # Utility functions
 ├── hooks/
 │   ├── use-ql-input.ts        # Main input logic
 │   └── use-debounce.ts        # Debouncing utility
+├── styles.css                 # Component styles
 docs/
 ├── README.md                  # Documentation index
 ├── FINAL_SUMMARY.md           # Project status and features

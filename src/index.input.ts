@@ -17,11 +17,8 @@ export { useDebounce } from './hooks/use-debounce';
 // Suggestion engine (React-specific functionality)
 export { QLSuggestionEngine } from './lib/ql-suggestions';
 
-// UI components (for advanced customization)
-export { Button } from './components/ui/button';
-export { Command, CommandEmpty, CommandItem, CommandList } from './components/ui/command';
-export { Input } from './components/ui/input';
-export { Popover, PopoverContent, PopoverTrigger } from './components/ui/popover';
+// Icons (for advanced customization)
+export { SearchIcon, XIcon, LoaderIcon, ChevronDownIcon, CheckIcon } from './components/ui/icons';
 
 // Utility functions
-export { cn } from './lib/utils';
+export { classNames } from './lib/utils';

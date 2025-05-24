@@ -113,13 +113,15 @@ function MyComponent() {
 }
 ```
 
-### With Tailwind CSS
+### Framework Independent
 
-If you're using Tailwind CSS, make sure to include the component styles in your CSS:
+The component is completely framework-independent and doesn't require Tailwind CSS or any other CSS framework. Simply import the CSS file and you're ready to go:
 
 ```css
 @import '@abaktiar/ql-input/styles.css';
 ```
+
+The component includes comprehensive styling with CSS custom properties for easy theming and dark mode support.
 
 ## 🎯 Component Props
 
@@ -139,6 +141,8 @@ interface QLInputProps {
   placeholder?: string;
   disabled?: boolean;
   className?: string;
+  showSearchIcon?: boolean;  // Default: true
+  showClearIcon?: boolean;   // Default: true
 
   // Async suggestions
   getAsyncValueSuggestions?: (field: string, typedValue: string) => Promise<QLValue[]>;
@@ -291,44 +295,82 @@ import { QLInput } from '@abaktiar/ql-input';
 
 function DarkModeExample() {
   return (
-    <div className="dark"> {/* or your dark mode class */}
+    <div className="dark"> {/* or use ql-dark, or data-theme="dark" */}
       <QLInput
         config={config}
-        placeholder="Dark mode supported..."
-        className="dark:bg-gray-800 dark:text-white"
+        placeholder="Dark mode supported automatically..."
       />
     </div>
   );
 }
 ```
 
+The component automatically detects dark mode using these selectors:
+- `.dark` (Tailwind CSS convention)
+- `.ql-dark` (component-specific)
+- `[data-theme="dark"]` (data attribute approach)
+
 ## 🎨 Styling & Customization
 
 ### CSS Custom Properties
 
-The component uses CSS custom properties for theming:
+The component uses CSS custom properties for comprehensive theming:
 
 ```css
 :root {
-  --ql-input-border: hsl(214.3 31.8% 91.4%);
-  --ql-input-background: hsl(0 0% 100%);
-  --ql-input-foreground: hsl(222.2 84% 4.9%);
-  --ql-input-muted: hsl(210 40% 96%);
-  --ql-input-muted-foreground: hsl(215.4 16.3% 46.9%);
-  --ql-input-ring: hsl(222.2 84% 4.9%);
+  /* Colors */
+  --ql-input-border: #e2e8f0;
+  --ql-input-background: #ffffff;
+  --ql-input-foreground: #1a202c;
+  --ql-input-muted: #f7fafc;
+  --ql-input-muted-foreground: #718096;
+  --ql-input-ring: #3182ce;
+  --ql-input-destructive: #e53e3e;
+  --ql-input-success: #38a169;
+  --ql-input-warning: #d69e2e;
+
+  /* Spacing and sizing */
+  --ql-input-radius: 0.375rem;
+  --ql-input-spacing-sm: 0.5rem;
+  --ql-input-spacing-md: 0.75rem;
+
+  /* Typography */
+  --ql-input-font-size-sm: 0.875rem;
+  --ql-input-line-height: 1.5;
+
+  /* Transitions */
+  --ql-input-transition: all 0.2s ease-in-out;
 }
 
-.dark {
-  --ql-input-border: hsl(217.2 32.6% 17.5%);
-  --ql-input-background: hsl(222.2 84% 4.9%);
-  --ql-input-foreground: hsl(210 40% 98%);
-  --ql-input-muted: hsl(217.2 32.6% 17.5%);
-  --ql-input-muted-foreground: hsl(215 20.2% 65.1%);
-  --ql-input-ring: hsl(212.7 26.8% 83.9%);
+/* Dark theme */
+.dark .ql-input-container,
+.ql-dark,
+[data-theme="dark"] .ql-input-container {
+  --ql-input-border: #4a5568;
+  --ql-input-background: #2d3748;
+  --ql-input-foreground: #f7fafc;
+  --ql-input-muted: #4a5568;
+  --ql-input-muted-foreground: #a0aec0;
+  --ql-input-ring: #63b3ed;
+  --ql-input-destructive: #fc8181;
+  --ql-input-success: #68d391;
+  --ql-input-warning: #f6e05e;
 }
 ```
 
 ### Custom Styling
+
+You can customize the component by overriding CSS custom properties:
+
+```css
+/* Custom theme */
+.my-custom-theme {
+  --ql-input-border: #3b82f6;
+  --ql-input-ring: #1d4ed8;
+  --ql-input-background: #f8fafc;
+  --ql-input-radius: 0.75rem;
+}
+```
 
 ```tsx
 import React from 'react';
@@ -336,16 +378,12 @@ import { QLInput } from '@abaktiar/ql-input';
 
 function StyledExample() {
   return (
-    <QLInput
-      config={config}
-      className="
-        border-2 border-blue-500
-        focus:border-blue-600
-        rounded-lg
-        shadow-lg
-      "
-      placeholder="Custom styled input..."
-    />
+    <div className="my-custom-theme">
+      <QLInput
+        config={config}
+        placeholder="Custom styled input..."
+      />
+    </div>
   );
 }
 ```
@@ -749,6 +787,51 @@ function ProductSearch() {
   );
 }
 ```
+
+## 🎨 Icon Customization
+
+### Icon Visibility Control
+
+Control which icons are displayed in the input:
+
+```tsx
+// Hide search icon for minimal design
+<QLInput
+  config={config}
+  showSearchIcon={false}
+  placeholder="Enter query..."
+/>
+
+// Hide clear icon to prevent accidental clearing
+<QLInput
+  config={config}
+  showClearIcon={false}
+  placeholder="Enter query..."
+/>
+
+// Hide both icons for ultra-minimal design
+<QLInput
+  config={config}
+  showSearchIcon={false}
+  showClearIcon={false}
+  placeholder="Enter query..."
+/>
+
+// Default behavior (both icons shown)
+<QLInput
+  config={config}
+  showSearchIcon={true}  // Default
+  showClearIcon={true}   // Default
+  placeholder="Enter query..."
+/>
+```
+
+### Use Cases for Icon Control
+
+- **Minimal Design**: Hide search icon when the context is clear
+- **Prevent Accidental Clearing**: Hide clear icon in critical forms
+- **Mobile Optimization**: Reduce visual clutter on small screens
+- **Custom Branding**: Match your application's design system
 
 ## 🎨 Theming Examples
 

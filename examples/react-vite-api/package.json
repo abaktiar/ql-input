@@ -1,0 +1,46 @@
+{
+  "name": "ql-input-react-vite-api-example",
+  "version": "1.0.0",
+  "description": "React + Vite example with @abaktiar/ql-input and mock API integration",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "server": "node server/index.js",
+    "dev:full": "concurrently \"npm run server\" \"npm run dev\""
+  },
+  "dependencies": {
+    "@abaktiar/ql-input": "^1.2.0",
+    "@abaktiar/ql-parser": "^1.2.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^6.28.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.25.0",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.4.1",
+    "concurrently": "^9.1.0",
+    "cors": "^2.8.5",
+    "eslint": "^9.25.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "express": "^4.21.2",
+    "globals": "^16.0.0",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5"
+  },
+  "keywords": [
+    "ql-input",
+    "react",
+    "vite",
+    "api",
+    "query-builder",
+    "example"
+  ],
+  "author": "abaktiar",
+  "license": "MIT"
+}

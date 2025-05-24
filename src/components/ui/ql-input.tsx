@@ -1,10 +1,8 @@
 import * as React from "react";
-import { cn } from "@/lib/utils";
+import { classNames } from '@/lib/utils';
 import type { QLInputProps, QLSuggestion } from '@/lib/ql-types';
 import { useQLInput } from '@/hooks/use-ql-input';
-import { Popover, PopoverContent, PopoverTrigger } from './popover';
-import { Command, CommandEmpty, CommandItem, CommandList } from './command';
-import { Loader2, Search, X } from 'lucide-react';
+import { SearchIcon, XIcon, LoaderIcon } from './icons';
 
 const QLInput = React.forwardRef<HTMLInputElement, QLInputProps>(
   (
@@ -16,6 +14,8 @@ const QLInput = React.forwardRef<HTMLInputElement, QLInputProps>(
       placeholder = 'Enter QL query...',
       disabled = false,
       className,
+      showSearchIcon = true,
+      showClearIcon = true,
       getAsyncValueSuggestions,
       getPredefinedValueSuggestions,
       ...props
@@ -23,6 +23,7 @@ const QLInput = React.forwardRef<HTMLInputElement, QLInputProps>(
     ref
   ) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
+    const suggestionsRef = React.useRef<HTMLDivElement>(null);
     const [isOpen, setIsOpen] = React.useState(false);
 
     const { state, handleInputChange, handleKeyDown, selectSuggestion } = useQLInput({
@@ -85,122 +86,114 @@ const QLInput = React.forwardRef<HTMLInputElement, QLInputProps>(
     // Syntax highlighting disabled to avoid text overlap issues
     // Can be implemented later with a different approach (e.g., contentEditable div)
 
-    return (
-      <div className='relative'>
-        <Popover open={isOpen} onOpenChange={setIsOpen}>
-          <PopoverTrigger asChild>
-            <div className='relative'>
-              <div className='relative'>
-                <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
-                <input
-                  ref={React.useMemo(() => {
-                    return (node: HTMLInputElement | null) => {
-                      if (typeof ref === 'function') {
-                        ref(node);
-                      } else if (ref) {
-                        ref.current = node;
-                      }
-                      inputRef.current = node;
-                    };
-                  }, [ref])}
-                  type='text'
-                  value={state.value}
-                  onChange={handleInput}
-                  onKeyDown={handleKeyDown}
-                  onSelect={handleSelectionChange}
-                  onFocus={() => setIsOpen(state.suggestions.length > 0)}
-                  onBlur={() => {
-                    // Delay hiding to allow suggestion clicks
-                    setTimeout(() => setIsOpen(false), 150);
-                  }}
-                  placeholder={placeholder}
-                  disabled={disabled}
-                  className={cn(
-                    'flex h-10 w-full rounded-md border border-input bg-background pl-10 pr-10 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-                    state.showSuggestions && 'ring-2 ring-blue-500/20 border-blue-500/50',
-                    !state.query.valid && state.value && 'ring-2 ring-red-500/20 border-red-500/50',
-                    className
-                  )}
-                  data-testid='ql-input'
-                  {...props}
-                />
-                {state.value && (
-                  <button
-                    type='button'
-                    onClick={handleClear}
-                    className='absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground hover:text-foreground'>
-                    <X className='h-4 w-4' />
-                  </button>
-                )}
-                {state.isLoading && (
-                  <Loader2 className='absolute right-8 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground' />
-                )}
-              </div>
-            </div>
-          </PopoverTrigger>
+    // Determine input state classes
+    const getInputStateClass = () => {
+      if (state.showSuggestions) return 'ql-input--suggestions';
+      if (!state.query.valid && state.value) return 'ql-input--invalid';
+      if (state.query.valid && state.value) return 'ql-input--valid';
+      return '';
+    };
 
-          <PopoverContent
-            className='w-[--radix-popover-trigger-width] p-0'
-            align='start'
-            onOpenAutoFocus={(e) => e.preventDefault()}
-            data-testid="suggestions-list">
-            <Command shouldFilter={false}>
-              <CommandList>
-                {state.suggestions.length === 0 ? (
-                  <CommandEmpty>No suggestions found.</CommandEmpty>
-                ) : (
-                  state.suggestions.map((suggestion, index) => {
-                    const isSelected = index === state.selectedSuggestionIndex;
-                    return (
-                      <CommandItem
-                        key={`${suggestion.category}-${index}`}
-                        value={suggestion.value}
-                        onSelect={() => handleSuggestionSelect(suggestion)}
-                        className={cn(
-                          'flex flex-col items-start gap-1 cursor-pointer',
-                          isSelected && 'bg-accent text-accent-foreground'
-                        )}
-                        data-testid="suggestion-item">
-                        <div className='flex items-center gap-2'>
-                          <span
-                            className={cn(
-                              'inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium',
-                              suggestion.type === 'field' &&
-                                'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-                              suggestion.type === 'operator' &&
-                                'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-                              suggestion.type === 'value' &&
-                                'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-                              suggestion.type === 'logical' &&
-                                'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-                              suggestion.type === 'keyword' &&
-                                'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
-                              suggestion.type === 'function' &&
-                                'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200',
-                              suggestion.type === 'parenthesis' &&
-                                'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
-                              suggestion.type === 'comma' &&
-                                'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
-                            )}>
+    const showClearButton = showClearIcon && state.value.length > 0 && !disabled;
+    const showLoadingIcon = state.isLoading;
+
+    return (
+      <div className={classNames('ql-input-container', className)}>
+        <div className='ql-input-wrapper'>
+          {/* Search Icon */}
+          {showSearchIcon && (
+            <div className='ql-input-icon ql-input-icon--search'>
+              <SearchIcon />
+            </div>
+          )}
+
+          {/* Main Input */}
+          <input
+            ref={React.useMemo(() => {
+              return (node: HTMLInputElement | null) => {
+                if (typeof ref === 'function') {
+                  ref(node);
+                } else if (ref) {
+                  ref.current = node;
+                }
+                inputRef.current = node;
+              };
+            }, [ref])}
+            type='text'
+            value={state.value}
+            onChange={handleInput}
+            onKeyDown={handleKeyDown}
+            onSelect={handleSelectionChange}
+            onFocus={() => setIsOpen(state.suggestions.length > 0)}
+            onBlur={() => {
+              // Delay hiding to allow suggestion clicks
+              setTimeout(() => setIsOpen(false), 150);
+            }}
+            placeholder={placeholder}
+            disabled={disabled}
+            className={classNames('ql-input', getInputStateClass())}
+            data-testid='ql-input'
+            {...props}
+          />
+
+          {/* Clear Button */}
+          {showClearButton && (
+            <button
+              type='button'
+              onClick={handleClear}
+              className='ql-input-icon ql-input-icon--clear'
+              aria-label='Clear input'>
+              <XIcon />
+            </button>
+          )}
+
+          {/* Loading Icon */}
+          {showLoadingIcon && (
+            <div className='ql-input-icon ql-input-icon--loading'>
+              <LoaderIcon />
+            </div>
+          )}
+        </div>
+
+        {/* Suggestions Popover */}
+        {isOpen && state.suggestions.length > 0 && (
+          <div className='ql-suggestions-popover' ref={suggestionsRef}>
+            <div className='ql-suggestions ql-fade-in'>
+              {state.suggestions.length === 0 ? (
+                <div className='ql-suggestions-empty'>No suggestions found.</div>
+              ) : (
+                state.suggestions.map((suggestion, index) => {
+                  const isSelected = index === state.selectedSuggestionIndex;
+                  return (
+                    <div
+                      key={`${suggestion.category}-${index}`}
+                      onClick={() => handleSuggestionSelect(suggestion)}
+                      className={classNames('ql-suggestion-item', isSelected && 'ql-suggestion-item--selected')}
+                      data-testid='suggestion-item'>
+                      <div className='ql-suggestion-item__content'>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <span className={classNames('ql-suggestion-type', `ql-suggestion-type--${suggestion.type}`)}>
                             {suggestion.type}
                           </span>
-                          <span className='font-medium'>{suggestion.displayValue || suggestion.value}</span>
+                          <span className='ql-suggestion-item__label'>
+                            {suggestion.displayValue || suggestion.value}
+                          </span>
                         </div>
                         {suggestion.description && (
-                          <span className='text-xs text-muted-foreground'>{suggestion.description}</span>
+                          <div className='ql-suggestion-item__description'>{suggestion.description}</div>
                         )}
-                      </CommandItem>
-                    );
-                  })
-                )}
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Validation errors */}
         {state.validationErrors.length > 0 && (
-          <div className='mt-1 text-xs text-red-600 dark:text-red-400'>{state.validationErrors[0].message}</div>
+          <div className='ql-validation-error'>{state.validationErrors[0].message}</div>
         )}
       </div>
     );
