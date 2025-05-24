@@ -1,6 +1,6 @@
 # QL Input & Parser
 
-A comprehensive Query Language (QL) solution with both a framework-agnostic parser and a React input component. Build powerful search interfaces with intelligent autocomplete, syntax highlighting, and robust query parsing.
+A comprehensive Query Language (QL) solution with both a framework-agnostic parser and a React input component. Build powerful search interfaces with intelligent autocomplete and robust query parsing.
 
 **🌐 [Live Demo](https://ql-input.netlify.app/)** - Try it out in your browser!
 

@@ -2,6 +2,8 @@
 
 This is a comprehensive full-stack example demonstrating how to use `@abaktiar/ql-input` and `@abaktiar/ql-parser` in a real-world application with API integration.
 
+**🌐 [Live Demo](https://ql-input.netlify.app/)** - See the component in action!
+
 ## 🎯 What This Example Shows
 
 - **Full-stack integration** - React frontend with Express.js backend
@@ -335,6 +337,7 @@ This example can be extended for:
 
 - [QL Input Documentation](../../README-input.md)
 - [QL Parser Documentation](../../README-parser.md)
+- [Development Guide](../../docs/DEVELOPMENT.md)
 - [React Router Documentation](https://reactrouter.com/)
 - [Express.js Documentation](https://expressjs.com/)
 - [Vite Documentation](https://vitejs.dev/)

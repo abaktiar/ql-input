@@ -1,5 +1,6 @@
 import { QLDemo } from '@/components/ql-demo';
 import './styles.css';
+import './demo.css';
 
 function App() {
   return (

@@ -2,6 +2,8 @@
 
 This example demonstrates how to use `@abaktiar/ql-parser` in a Node.js environment without any UI framework dependencies.
 
+**🌐 [Live Demo](https://ql-input.netlify.app/)** - See the parser in action with the React component!
+
 ## 🎯 What This Example Shows
 
 - Basic query parsing and validation
@@ -127,5 +129,6 @@ This parser can be integrated into:
 ## 📚 Next Steps
 
 - Check out the [React Component Example](../react-component/) for UI integration
-- See the [Next.js Example](../nextjs-app/) for full-stack usage
+- See the [React + Vite + API Example](../react-vite-api/) for full-stack usage
 - Read the [Parser Documentation](../../README-parser.md) for complete API reference
+- Explore the [Development Guide](../../docs/DEVELOPMENT.md) for advanced patterns

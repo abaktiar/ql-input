@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { QLInput } from './ui/ql-input';
 import type { QLInputConfig, QLQuery, QLValue, QLField, QLFunction } from '@/lib/ql-types';
 import { toMongooseQuery, toSQLQuery, printExpression, countConditions } from '@/lib/ql-query-builder';
@@ -168,6 +168,31 @@ export function QLDemo() {
   const [executedQuery, setExecutedQuery] = useState<QLQuery | null>(null);
   const [showSearchIcon, setShowSearchIcon] = useState(true);
   const [showClearIcon, setShowClearIcon] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Initialize dark mode from localStorage or system preference
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('ql-demo-theme');
+    if (savedTheme) {
+      setIsDarkMode(savedTheme === 'dark');
+    } else {
+      setIsDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+    }
+  }, []);
+
+  // Apply dark mode class to document
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('ql-dark');
+    } else {
+      document.documentElement.classList.remove('ql-dark');
+    }
+    localStorage.setItem('ql-demo-theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
 
   // Mock async user suggestions
   const getAsyncValueSuggestions = async (field: string, typedValue: string): Promise<QLValue[]> => {
@@ -206,11 +231,36 @@ export function QLDemo() {
 
   return (
     <div className='demo-section'>
-      <div>
-        <h2 className='demo-title'>QL Input Component Demo</h2>
-        <p className='demo-description'>
-          A comprehensive QL (Query Language) input component with autocomplete, syntax highlighting, and validation.
-        </p>
+      <div className='demo-header'>
+        <div>
+          <h2 className='demo-title'>QL Input & Parser</h2>
+          <p className='demo-description'>
+            A comprehensive QL (Query Language) input component with intelligent autocomplete and validation.
+          </p>
+        </div>
+        <div className='demo-theme-toggle-container'>
+          <span className='demo-theme-toggle-label'>Theme</span>
+          <button
+            className={`demo-theme-toggle ${isDarkMode ? 'demo-theme-toggle--dark' : 'demo-theme-toggle--light'}`}
+            onClick={toggleDarkMode}
+            aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
+            title={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}>
+            <span className='demo-theme-toggle-slider'>
+              <span className='demo-theme-toggle-icon'>
+                {isDarkMode ? (
+                  <svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                    <circle cx='12' cy='12' r='5' />
+                    <path d='M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42' />
+                  </svg>
+                ) : (
+                  <svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                    <path d='M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z' />
+                  </svg>
+                )}
+              </span>
+            </span>
+          </button>
+        </div>
       </div>
 
       <div className='demo-section'>
@@ -390,6 +440,23 @@ export function QLDemo() {
           </div>
         </div>
       </div>
+
+      {/* Footer with attribution */}
+      <footer className='demo-footer'>
+        <div className='demo-footer-content'>
+          <p className='demo-footer-text'>
+            Built with ❤️ by{' '}
+            <a
+              href='https://github.com/abaktiar'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='demo-footer-link'>
+              abaktiar
+            </a>
+          </p>
+          <p className='demo-footer-subtext'>Open source QL Input component for modern web applications</p>
+        </div>
+      </footer>
     </div>
   );
 }

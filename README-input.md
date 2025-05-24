@@ -1,6 +1,6 @@
 # @abaktiar/ql-input
 
-A comprehensive React QL (Query Language) input component with intelligent autocomplete, syntax highlighting, query validation, and a beautiful UI built with TypeScript and shadcn/ui components.
+A comprehensive React QL (Query Language) input component with intelligent autocomplete, query validation, and a beautiful UI built with TypeScript and shadcn/ui components.
 
 **🌐 [Live Demo](https://ql-input.netlify.app/)** - Try the component in action!
 

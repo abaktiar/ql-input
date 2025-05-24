@@ -2,6 +2,8 @@
 
 This example demonstrates how to use `@abaktiar/ql-input` in a React application with full interactive features.
 
+**🌐 [Live Demo](https://ql-input.netlify.app/)** - Experience the component online!
+
 ## 🎯 What This Example Shows
 
 - Complete React integration with TypeScript
@@ -108,7 +110,6 @@ const config: QLInputConfig = {
 
 ### Interactive Query Builder
 - **Autocomplete**: Smart suggestions based on context
-- **Syntax Highlighting**: Visual feedback for query structure
 - **Validation**: Real-time error detection and reporting
 - **Keyboard Navigation**: Full keyboard support
 
@@ -217,10 +218,10 @@ Built-in functions:
 ## 📚 Related Examples
 
 - [Parser Only Example](../parser-only/) - Backend integration
-- [Next.js Example](../nextjs-app/) - Full-stack application
-- [Issue Tracker Example](../issue-tracker/) - Real-world implementation
+- [React + Vite + API Example](../react-vite-api/) - Full-stack application with API
 
 ## 📖 Documentation
 
 - [Component API Reference](../../README-input.md)
 - [Parser Documentation](../../README-parser.md)
+- [Development Guide](../../docs/DEVELOPMENT.md)

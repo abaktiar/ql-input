@@ -19,6 +19,7 @@ body {
 }
 
 /* Dark mode for body */
+.ql-dark body,
 .dark body {
   background-color: #1a202c;
   color: #f7fafc;

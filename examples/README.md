@@ -2,6 +2,8 @@
 
 This folder contains practical examples demonstrating how to use `@abaktiar/ql-parser` and `@abaktiar/ql-input` packages in real-world scenarios.
 
+**🌐 [Live Demo](https://ql-input.netlify.app/)** - Try the component online before diving into the examples!
+
 ## 📁 Examples Overview
 
 ### 1. **Parser Only** (`parser-only/`)
@@ -14,20 +16,10 @@ This folder contains practical examples demonstrating how to use `@abaktiar/ql-p
 - Interactive demo with live query building
 - Real-time validation and suggestions
 
-### 3. **Next.js Integration** (`nextjs-app/`)
-- Full-stack Next.js application
-- Server-side query processing
-- API integration examples
-
-### 4. **Issue Tracker** (`issue-tracker/`)
-- Real-world issue tracking system
-- Advanced filtering and search
-- User management integration
-
-### 5. **E-commerce Search** (`ecommerce-search/`)
-- Product search and filtering
-- Category-based queries
-- Price range filtering
+### 3. **React + Vite + API** (`react-vite-api/`)
+- Full-stack React application with Vite
+- Mock API server integration
+- Advanced async suggestions and query processing
 
 ## 🚀 Quick Start
 
@@ -68,4 +60,5 @@ npm start
 
 - [Parser Documentation](../README-parser.md)
 - [Input Component Documentation](../README-input.md)
-- [Publishing Guide](../PUBLISHING_GUIDE.md)
+- [Development Guide](../docs/DEVELOPMENT.md)
+- [Publishing Guide](../docs/PUBLISHING.md)

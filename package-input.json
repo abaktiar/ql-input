@@ -1,7 +1,7 @@
 {
   "name": "@abaktiar/ql-input",
-  "version": "1.2.0",
-  "description": "React QL input component with intelligent autocomplete, syntax highlighting, and query validation. Framework-independent with zero external dependencies.",
+  "version": "1.3.0",
+  "description": "React QL input component with intelligent autocomplete and query validation. Framework-independent with zero external dependencies.",
   "main": "./index.js",
   "module": "./index.mjs",
   "types": "./index.d.ts",
@@ -14,18 +14,7 @@
     "./styles.css": "./styles.css"
   },
   "files": ["index.js", "index.mjs", "index.d.ts", "styles.css", "README.md"],
-  "keywords": [
-    "react",
-    "query",
-    "input",
-    "autocomplete",
-    "typescript",
-    "shadcn",
-    "ui-component",
-    "query-builder",
-    "syntax-highlighting",
-    "validation"
-  ],
+  "keywords": ["react", "query", "input", "autocomplete", "typescript", "shadcn", "ui-component", "query-builder", "validation"],
   "author": "abaktiar",
   "license": "MIT",
   "repository": {
