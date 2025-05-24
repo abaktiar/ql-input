@@ -75,6 +75,32 @@ npm run dev
 - **Request/response formats**
 - **Parameter descriptions**
 
+## ✅ Backend Filtering & Sorting
+
+The mock API server now supports **complete filtering and sorting**:
+
+### **Filtering Support**
+- ✅ **Equality operators**: `=`, `!=`, `<>`
+- ✅ **Comparison operators**: `>`, `<`, `>=`, `<=` (for numbers and dates)
+- ✅ **Text search**: `~` (contains), `!~` (does not contain) - case insensitive
+- ✅ **List operators**: `IN`, `NOT IN` (supports arrays like tags)
+- ✅ **Null checks**: `IS EMPTY`, `IS NOT EMPTY`, `IS NULL`, `IS NOT NULL`
+- ✅ **Complex grouping**: `(condition1 OR condition2) AND condition3`
+- ✅ **Array field support**: Tags field with `IN`/`NOT IN` operators
+
+### **Sorting Support**
+- ✅ **Single field sorting**: `ORDER BY priority DESC`
+- ✅ **Multi-field sorting**: `ORDER BY priority DESC, created ASC`
+- ✅ **Data type aware**: Numbers, dates, and strings sorted correctly
+- ✅ **Null handling**: Null values sorted appropriately
+
+### **Fixed Issues**
+- 🔧 **Expression evaluation**: Fixed nested grouping and complex conditions
+- 🔧 **Data type handling**: Proper numeric, date, and string comparisons
+- 🔧 **Array field filtering**: Tags field now works with IN/NOT IN operators
+- 🔧 **Null value handling**: IS EMPTY/IS NOT EMPTY operators work correctly
+- 🔧 **Case insensitive search**: Text search operators ignore case
+
 ## 🔍 API Endpoints
 
 ### Issues
@@ -107,29 +133,85 @@ The example includes realistic mock data:
 
 ## 🎮 Usage Examples
 
-### Basic Search
-```
+### Basic Filtering
+```sql
+-- Status filtering
 status = "open"
+status IN ("open", "pending")
+status NOT IN ("closed")
+
+-- Priority filtering
+priority >= 3
+priority = 4
+
+-- Assignee filtering
+assignee IS EMPTY
+assignee IS NOT EMPTY
+assignee = "john.doe"
 ```
 
-### Complex Filtering
+### Text Search (Case Insensitive)
+```sql
+-- Title contains "bug"
+title ~ "bug"
+title ~ "BUG"  -- Same result
+
+-- Title does not contain "documentation"
+title !~ "documentation"
 ```
+
+### Array Field Filtering
+```sql
+-- Tags contain any of these values
+tags IN ("bug", "critical")
+
+-- Tags don't contain these values
+tags NOT IN ("documentation", "feature")
+```
+
+### Complex Conditions
+```sql
+-- Multiple conditions with grouping
 (status = "open" OR status = "pending") AND priority >= 3
+
+-- Complex assignee and priority logic
+(assignee IS EMPTY OR assignee = "john.doe") AND priority = 4
+
+-- Text search with status filter
+title ~ "bug" AND status != "closed"
 ```
 
-### Text Search
-```
-title ~ "bug" AND assignee IS NOT EMPTY
-```
+### Sorting Examples
+```sql
+-- Single field sorting
+ORDER BY priority DESC
+ORDER BY created ASC
 
-### Sorting
-```
+-- Multi-field sorting
+ORDER BY priority DESC, created ASC
+ORDER BY status ASC, priority DESC, created ASC
+
+-- Filtering with sorting
 status = "open" ORDER BY priority DESC, created ASC
+priority >= 3 ORDER BY priority DESC, created ASC
 ```
 
-### Function Usage
-```
-assignee = currentUser() AND created >= startOfWeek()
+### Real-World Query Examples
+```sql
+-- High priority open issues
+status = "open" AND priority >= 3 ORDER BY priority DESC
+
+-- Unassigned critical issues
+assignee IS EMPTY AND priority = 4
+
+-- Recent bug reports
+title ~ "bug" AND created >= "2024-01-10" ORDER BY created DESC
+
+-- Project-specific open issues
+project = "project-alpha" AND status != "closed" ORDER BY priority DESC
+
+-- Security-related items
+tags IN ("security", "audit") ORDER BY priority DESC, created ASC
 ```
 
 ## 🔧 Technical Implementation

@@ -143,51 +143,85 @@ function filterIssues(issues, query) {
 
 // Simple expression evaluator for demo purposes
 function evaluateExpression(item, expression) {
-  if (expression.type === 'condition') {
-    const { field, operator, value } = expression;
-    const itemValue = item[field];
+  // Handle direct condition objects (when there's no grouping)
+  if (expression.field && expression.operator) {
+    return evaluateCondition(item, expression);
+  }
 
-    switch (operator) {
-      case '=':
-        return itemValue === value;
-      case '!=':
-        return itemValue !== value;
-      case '>':
-        return Number(itemValue) > Number(value);
-      case '<':
-        return Number(itemValue) < Number(value);
-      case '>=':
-        return Number(itemValue) >= Number(value);
-      case '<=':
-        return Number(itemValue) <= Number(value);
-      case '~':
-        return itemValue && itemValue.toLowerCase().includes(value.toLowerCase());
-      case '!~':
-        return !itemValue || !itemValue.toLowerCase().includes(value.toLowerCase());
-      case 'IN':
-        const values = Array.isArray(value) ? value : [value];
-        return values.includes(itemValue);
-      case 'NOT IN':
-        const notValues = Array.isArray(value) ? value : [value];
-        return !notValues.includes(itemValue);
-      case 'IS EMPTY':
-        return !itemValue || itemValue === '';
-      case 'IS NOT EMPTY':
-        return itemValue && itemValue !== '';
-      default:
-        return true;
-    }
-  } else if (expression.type === 'group') {
+  // Handle grouped expressions (with operator and conditions)
+  if (expression.operator && expression.conditions) {
     const { operator, conditions } = expression;
-    
+
     if (operator === 'AND') {
       return conditions.every(cond => evaluateExpression(item, cond));
     } else if (operator === 'OR') {
       return conditions.some(cond => evaluateExpression(item, cond));
     }
   }
-  
+
+  // Handle legacy format with type property
+  if (expression.type === 'condition') {
+    return evaluateCondition(item, expression);
+  } else if (expression.type === 'group') {
+    const { operator, conditions } = expression;
+
+    if (operator === 'AND') {
+      return conditions.every((cond) => evaluateExpression(item, cond));
+    } else if (operator === 'OR') {
+      return conditions.some((cond) => evaluateExpression(item, cond));
+    }
+  }
+
   return true;
+}
+
+// Helper function to evaluate a single condition
+function evaluateCondition(item, condition) {
+  const { field, operator, value } = condition;
+  const itemValue = item[field];
+
+  switch (operator) {
+    case '=':
+      return itemValue === value;
+    case '!=':
+    case '<>':
+      return itemValue !== value;
+    case '>':
+      return Number(itemValue) > Number(value);
+    case '<':
+      return Number(itemValue) < Number(value);
+    case '>=':
+      return Number(itemValue) >= Number(value);
+    case '<=':
+      return Number(itemValue) <= Number(value);
+    case '~':
+      return itemValue && String(itemValue).toLowerCase().includes(String(value).toLowerCase());
+    case '!~':
+      return !itemValue || !String(itemValue).toLowerCase().includes(String(value).toLowerCase());
+    case 'IN':
+      const values = Array.isArray(value) ? value : [value];
+      if (Array.isArray(itemValue)) {
+        // For array fields like tags, check if any item value is in the search values
+        return itemValue.some((iv) => values.includes(iv));
+      }
+      return values.includes(itemValue);
+    case 'NOT IN':
+      const notValues = Array.isArray(value) ? value : [value];
+      if (Array.isArray(itemValue)) {
+        // For array fields like tags, check if no item value is in the search values
+        return !itemValue.some((iv) => notValues.includes(iv));
+      }
+      return !notValues.includes(itemValue);
+    case 'IS EMPTY':
+    case 'IS NULL':
+      return !itemValue || itemValue === '' || (Array.isArray(itemValue) && itemValue.length === 0);
+    case 'IS NOT EMPTY':
+    case 'IS NOT NULL':
+      return itemValue && itemValue !== '' && (!Array.isArray(itemValue) || itemValue.length > 0);
+    default:
+      console.warn(`Unknown operator: ${operator}`);
+      return true;
+  }
 }
 
 // API Routes
@@ -205,24 +239,24 @@ app.get('/api/issues', (req, res) => {
 app.post('/api/issues/search', (req, res) => {
   try {
     const { query: queryString } = req.body;
-    
+
     if (!queryString) {
       return res.json({
         success: true,
         data: mockIssues,
         total: mockIssues.length,
-        query: null
+        query: null,
       });
     }
 
     // Parse the query
     const parsedQuery = parser.parse(queryString);
-    
+
     if (!parsedQuery.valid) {
       return res.status(400).json({
         success: false,
         error: 'Invalid query',
-        errors: parsedQuery.errors
+        errors: parsedQuery.errors,
       });
     }
 
@@ -236,11 +270,31 @@ app.post('/api/issues/search', (req, res) => {
           const { field, direction } = order;
           const aVal = a[field];
           const bVal = b[field];
-          
+
           let comparison = 0;
-          if (aVal < bVal) comparison = -1;
-          else if (aVal > bVal) comparison = 1;
-          
+
+          // Handle null/undefined values
+          if (aVal == null && bVal == null) comparison = 0;
+          else if (aVal == null) comparison = -1;
+          else if (bVal == null) comparison = 1;
+          else {
+            // Handle different data types
+            if (field === 'priority' || field === 'id') {
+              // Numeric comparison
+              comparison = Number(aVal) - Number(bVal);
+            } else if (field === 'created') {
+              // Date comparison
+              comparison = new Date(aVal).getTime() - new Date(bVal).getTime();
+            } else {
+              // String comparison
+              const aStr = String(aVal).toLowerCase();
+              const bStr = String(bVal).toLowerCase();
+              if (aStr < bStr) comparison = -1;
+              else if (aStr > bStr) comparison = 1;
+              else comparison = 0;
+            }
+          }
+
           if (comparison !== 0) {
             return direction === 'DESC' ? -comparison : comparison;
           }
@@ -257,15 +311,14 @@ app.post('/api/issues/search', (req, res) => {
         raw: queryString,
         parsed: parsedQuery,
         mongodb: toMongooseQuery(parsedQuery),
-        sql: toSQLQuery(parsedQuery)
-      }
+        sql: toSQLQuery(parsedQuery),
+      },
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
       error: 'Server error',
-      message: error.message
+      message: error.message,
     });
   }
 });
@@ -273,57 +326,59 @@ app.post('/api/issues/search', (req, res) => {
 // Get user suggestions
 app.get('/api/suggestions/users', (req, res) => {
   const { q } = req.query;
-  
+
   let users = mockUsers;
-  
+
   if (q) {
     const query = q.toLowerCase();
-    users = mockUsers.filter(user => 
-      user.label.toLowerCase().includes(query) ||
-      user.value.toLowerCase().includes(query) ||
-      user.email.toLowerCase().includes(query)
+    users = mockUsers.filter(
+      (user) =>
+        user.label.toLowerCase().includes(query) ||
+        user.value.toLowerCase().includes(query) ||
+        user.email.toLowerCase().includes(query)
     );
   }
-  
+
   res.json({
     success: true,
-    data: users.map(user => ({
+    data: users.map((user) => ({
       value: user.value,
-      label: user.label
-    }))
+      label: user.label,
+    })),
   });
 });
 
 // Get project suggestions
 app.get('/api/suggestions/projects', (req, res) => {
   const { q } = req.query;
-  
+
   let projects = mockProjects;
-  
+
   if (q) {
     const query = q.toLowerCase();
-    projects = mockProjects.filter(project => 
-      project.label.toLowerCase().includes(query) ||
-      project.value.toLowerCase().includes(query) ||
-      project.description.toLowerCase().includes(query)
+    projects = mockProjects.filter(
+      (project) =>
+        project.label.toLowerCase().includes(query) ||
+        project.value.toLowerCase().includes(query) ||
+        project.description.toLowerCase().includes(query)
     );
   }
-  
+
   res.json({
     success: true,
-    data: projects.map(project => ({
+    data: projects.map((project) => ({
       value: project.value,
-      label: project.label
-    }))
+      label: project.label,
+    })),
   });
 });
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    success: true, 
+  res.json({
+    success: true,
     message: 'QL Input API Server is running',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
