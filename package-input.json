@@ -14,7 +14,17 @@
     "./styles.css": "./styles.css"
   },
   "files": ["index.js", "index.mjs", "index.d.ts", "styles.css", "README.md"],
-  "keywords": ["react", "query", "input", "autocomplete", "typescript", "shadcn", "ui-component", "query-builder", "validation"],
+  "keywords": [
+    "react",
+    "query",
+    "input",
+    "autocomplete",
+    "typescript",
+    "shadcn",
+    "ui-component",
+    "query-builder",
+    "validation"
+  ],
   "author": "abaktiar",
   "license": "MIT",
   "repository": {
@@ -31,9 +41,6 @@
   "peerDependencies": {
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0"
-  },
-  "dependencies": {
-    "clsx": "^2.1.1"
   },
   "sideEffects": ["*.css"]
 }
