@@ -1,4 +1,4 @@
-# Publishing Guide for @abaktiar/ql-parser and @abaktiar/ql-input
+# Publishing Guide
 
 This guide explains how to build and publish both packages from this monorepo.
 

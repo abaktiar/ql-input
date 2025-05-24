@@ -2,6 +2,8 @@
 
 A powerful, framework-agnostic QL (Query Language) parser and builder for creating complex queries with support for logical operators, functions, parentheses grouping, and ORDER BY clauses.
 
+**🌐 [Live Demo](https://ql-input.netlify.app/)** - See the parser in action with the React component!
+
 [![npm version](https://badge.fury.io/js/@abaktiar%2Fql-parser.svg)](https://badge.fury.io/js/@abaktiar%2Fql-parser)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -98,7 +100,7 @@ status = "open" AND assignee = currentUser() ORDER BY created DESC, priority ASC
 
 #### Comparison Operators
 - `=` - Equals
-- `!=` - Not equals  
+- `!=` - Not equals
 - `>` - Greater than
 - `<` - Less than
 - `>=` - Greater than or equal
@@ -141,10 +143,10 @@ Main parser class for tokenizing and parsing QL queries.
 ```typescript
 class QLParser {
   constructor(config: QLInputConfig)
-  
+
   // Tokenize input string into tokens
   tokenize(input: string): QLToken[]
-  
+
   // Parse input string into structured query
   parse(input: string): QLQuery
 }
@@ -169,7 +171,7 @@ Convert parsed queries to different formats:
 // Convert to MongoDB query
 function toMongooseQuery(query: QLQuery): object
 
-// Convert to SQL WHERE clause  
+// Convert to SQL WHERE clause
 function toSQLQuery(query: QLQuery): string
 
 // Print expression as readable string
@@ -204,8 +206,8 @@ const complex = parser.parse('(status = "open" OR status = "pending") AND assign
 ```typescript
 // Using built-in functions
 const withFunctions = parser.parse(`
-  assignee = currentUser() AND 
-  created >= startOfWeek() AND 
+  assignee = currentUser() AND
+  created >= startOfWeek() AND
   created <= endOfWeek()
 `);
 
@@ -297,14 +299,14 @@ const config: QLInputConfig = {
 ```typescript
 // Nested parentheses
 const nested = parser.parse(`
-  (status = "open" OR status = "pending") AND 
+  (status = "open" OR status = "pending") AND
   (assignee = currentUser() OR (assignee IS EMPTY AND priority = "high"))
 `);
 
 // Mixed operators
 const mixed = parser.parse(`
-  status IN ("open", "pending") AND 
-  title ~ "urgent" AND 
+  status IN ("open", "pending") AND
+  title ~ "urgent" AND
   created >= startOfWeek() AND
   assignee IS NOT EMPTY
 `);
@@ -315,7 +317,7 @@ const mixed = parser.parse(`
 ```typescript
 function traverseExpression(expr: QLExpression, depth = 0): void {
   const indent = '  '.repeat(depth);
-  
+
   if (expr.type === 'condition') {
     console.log(`${indent}Condition: ${expr.field} ${expr.operator} ${expr.value}`);
   } else if (expr.type === 'group') {
