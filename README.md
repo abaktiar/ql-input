@@ -4,8 +4,6 @@ A comprehensive Query Language (QL) solution with both a framework-agnostic pars
 
 **🌐 [Live Demo](https://ql-input.netlify.app/)** - Try it out in your browser!
 
-![QL Input Demo](https://via.placeholder.com/800x400/1f2937/ffffff?text=QL+Input+Component+Demo)
-
 ## 📦 Dual Package Architecture
 
 This repository provides two complementary packages:
