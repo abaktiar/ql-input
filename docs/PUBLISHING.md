@@ -137,13 +137,13 @@ If you update the parser package, make sure to update the dependency version in 
 │   ├── parser/           # Built parser package
 │   │   ├── index.js
 │   │   ├── index.mjs
-│   │   ├── index.d.ts
+│   │   ├── index.d.mts
 │   │   ├── package.json
 │   │   └── README.md
 │   └── input/            # Built input package
 │       ├── index.js
 │       ├── index.mjs
-│       ├── index.d.ts
+│       ├── index.d.mts
 │       ├── styles.css
 │       ├── package.json
 │       └── README.md

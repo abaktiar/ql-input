@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
 import dts from 'vite-plugin-dts'
+import fs from 'fs';
+import path from 'path';
 
 export default defineConfig({
   plugins: [
@@ -10,7 +12,7 @@ export default defineConfig({
         'src/lib/ql-parser.ts',
         'src/lib/ql-expression-parser.ts',
         'src/lib/ql-query-builder.ts',
-        'src/lib/index.parser.ts'
+        'src/lib/index.parser.ts',
       ],
       exclude: [
         'src/components/**/*',
@@ -20,13 +22,24 @@ export default defineConfig({
         'tests/**/*',
         'playwright.config.ts',
         'vite.config.ts',
-        'vite.config.*.ts'
+        'vite.config.*.ts',
       ],
       outDir: 'dist/parser',
       insertTypesEntry: true,
       rollupTypes: true,
-      tsconfigPath: './tsconfig.app.json'
-    })
+      tsconfigPath: './tsconfig.app.json',
+      afterBuild: () => {
+        // Rename .d.mts to .d.ts after build
+        const distDir = path.resolve(process.cwd(), 'dist/parser');
+        const mtsFile = path.join(distDir, 'index.d.mts');
+        const dtsFile = path.join(distDir, 'index.d.ts');
+
+        if (fs.existsSync(mtsFile)) {
+          fs.renameSync(mtsFile, dtsFile);
+          console.log('Renamed index.d.mts to index.d.ts');
+        }
+      },
+    }),
   ],
   build: {
     outDir: 'dist/parser',
@@ -34,20 +47,20 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/lib/index.parser.ts'),
       name: 'QLParser',
       formats: ['es', 'cjs'],
-      fileName: (format) => `index.${format === 'es' ? 'mjs' : 'js'}`
+      fileName: (format) => `index.${format === 'es' ? 'mjs' : 'js'}`,
     },
     rollupOptions: {
       external: [],
       output: {
-        globals: {}
-      }
+        globals: {},
+      },
     },
     sourcemap: true,
-    minify: 'terser'
+    minify: 'terser',
   },
   resolve: {
     alias: {
-      "@": resolve(__dirname, "./src"),
+      '@': resolve(__dirname, './src'),
     },
-  }
-})
+  },
+});

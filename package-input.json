@@ -1,6 +1,6 @@
 {
   "name": "@abaktiar/ql-input",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "React QL input component with intelligent autocomplete and query validation. Framework-independent with zero external dependencies.",
   "main": "./index.js",
   "module": "./index.mjs",
