@@ -24,6 +24,21 @@ export const testQueries = {
       '(project = PROJ1 OR project = PROJ2) AND status = Open',
       'project = PROJ1 AND (status = Open OR status = "In Progress")',
       '(project = PROJ1 AND status = Open) OR (project = PROJ2 AND priority = High)',
+      '(project = PROJ1 AND (status = Open OR priority > 2)) OR assignee = currentUser()',
+      'NOT (project = PROJ1 AND status = Open)',
+      'NOT (project = PROJ1 OR project = PROJ2 OR project = PROJ3)',
+      '((project = PROJ1 AND status = Open) OR (assignee = "jane.doe" AND priority < 3)) AND created >= startOfWeek()',
+      'NOT ((project = PROJ1 AND status = Open) OR (assignee = "jane.doe"))',
+    ],
+    invalid: [
+      '(project = PROJ1 AND status = Open', // Mismatched parentheses
+      'project = PROJ1 AND', // Incomplete logical expression
+      'project = PROJ1 OR', // Incomplete logical expression
+      'NOT', // Incomplete NOT
+      'project = NOT Open', // Invalid NOT usage (parser expects NOT at start of condition/group)
+      'project = PROJ1 AND OR status = Open', // Double logical operator
+      'AND project = PROJ1', // Leading logical operator
+      '(project = PROJ1 (status = Open))', // Missing logical operator
     ],
   },
 
@@ -33,29 +48,84 @@ export const testQueries = {
     mixed: ['project IN (PROJ1, "Project Alpha", PROJ2)', 'status IN (Open, "In Progress", Closed)'],
   },
 
-  // Note: ORDER BY is not currently implemented in the parser
-  // orderBy: {
-  //   simple: [
-  //     'project = PROJ1 ORDER BY priority',
-  //     'status = Open ORDER BY created',
-  //     'assignee = john.doe ORDER BY updated DESC',
-  //   ],
-  //   multiple: [
-  //     'project = PROJ1 ORDER BY priority ASC, created DESC',
-  //     'status = Open ORDER BY assignee, priority DESC, created',
-  //   ],
-  // },
+  orderBy: {
+    simple: [
+      'project = PROJ1 ORDER BY priority',
+      'status = Open ORDER BY created',
+      'assignee = john.doe ORDER BY updated DESC',
+      'ORDER BY priority', // ORDER BY without WHERE
+      'ORDER BY created DESC', // ORDER BY without WHERE
+      'project = PROJ1 order by priority desc', // Mixed case
+      'ORDER by status aSc, updated DeSc', // Mixed case without WHERE
+    ],
+    multiple: [
+      'project = PROJ1 ORDER BY priority ASC, created DESC',
+      'status = Open ORDER BY assignee, priority DESC, created',
+      'ORDER BY priority ASC, created DESC', // ORDER BY without WHERE
+    ],
+    invalid: [
+      'ORDER BY nonExistentField',
+      'ORDER BY priority ASC,',
+      'ORDER BY priority WRONGDIR',
+      'project = PROJ1 ORDER BY priority WRONGDIR',
+      'ORDER BY priority, nonExistentField DESC',
+      'ORDER BY ,priority',
+    ],
+  },
 
-  functions: [
-    'assignee = currentUser()',
-    'created >= startOfWeek()',
-    'updated <= endOfDay()',
-    'project IN (currentUser(), "PROJ1")',
-  ],
+  functions: {
+    valid: [
+      'assignee = currentUser()',
+      'created >= startOfWeek()',
+      'updated <= endOfDay()',
+      'project IN (currentUser(), "PROJ1")',
+      'status IN (currentUser(), "Open", "Closed") AND assignee = currentUser()', // Assuming currentUser() could return a status
+    ],
+    invalid: [
+      'assignee = nonExistentFunction()',
+      'assignee = currentUser(',
+      'assignee = currentUser(extraParam)',
+      'project IN (nonExistentFunction(), "PROJ1")',
+      'created = startOfWeek(1, 2)',
+    ],
+  },
 
   multiWord: {
     quoted: ['status = "In Progress"', 'project = "Project Alpha"', 'summary ~ "Bug Report"'],
     inLists: ['status IN ("In Progress", "Code Review")', 'project IN ("Project Alpha", "Project Beta", PROJ1)'],
+  },
+
+  whitespace: {
+    valid: [
+      '  project = PROJ1  ',
+      'project  =  PROJ1',
+      'project =   PROJ1',
+      '  (  project = PROJ1   AND status = Open )  ',
+      'project IN (  PROJ1  ,  PROJ2  )',
+      '  ORDER   BY  priority   DESC  ',
+    ],
+  },
+
+  edgeCases: {
+    valid: [
+      'project = PROJ1 AND status = Open AND assignee = "john.doe" AND priority = High AND summary ~ "test" AND created >= "2023-01-01" AND updated < "2024-01-01"', // All field types
+      'PROJECT = PROJ1 AND STATUS = OPEN', // Case insensitivity for fields/values (parser handles this)
+      'order = "test" AND by = "test2"', // Using keywords as field names (if quoted or parser allows)
+      'summary = "value with (parentheses)"',
+      'summary = "value with \\"escaped quotes\\""',
+    ],
+    invalid: [
+      'project IN ()',
+      'project IN (,)',
+      'project IN (PROJ1,)',
+      'project IN (,PROJ1)',
+      'project = "unterminated string',
+      'project = \'unterminated string',
+      '(project = PROJ1', // Mismatched parentheses (already in logical.invalid but good here too)
+      'project = PROJ1) AND status = Open', // Mismatched parentheses
+      // 'ORDER = "value"', // Using keyword as unquoted field - parser's classifyTokens might misinterpret
+      // 'BY = "value"', // Using keyword as unquoted field
+    ],
   },
 };
 

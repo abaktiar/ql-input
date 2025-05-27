@@ -254,4 +254,156 @@ test.describe('QL Suggestions Unit Tests', () => {
       expect(suggestions.some(s => s.value === 'project')).toBe(false);
     });
   });
+
+  test.describe('ORDER BY Suggestions', () => {
+    test('should suggest fields after "ORDER BY "', () => {
+      const input = 'ORDER BY ';
+      const tokens = parser.tokenize(input);
+      const context = suggestionEngine.getSuggestionContext(input, input.length, tokens);
+      const suggestions = suggestionEngine.getSuggestions(context);
+
+      expect(context.inOrderBy).toBe(true);
+      expect(context.expectingField).toBe(true);
+      const fieldSuggestions = suggestions.filter((s) => s.type === 'field');
+      // Based on getSortableFieldSuggestions, only sortable fields are suggested.
+      // 'created' and 'updated' are explicitly sortable: true.
+      // Other fields are not explicitly sortable: false, so they should be suggested.
+      const sortableFields = testFields.filter(f => f.sortable !== false).map(f => f.name);
+      expect(fieldSuggestions.length).toBe(sortableFields.length);
+      for (const field of sortableFields) {
+        expect(fieldSuggestions.some((s) => s.value === field)).toBe(true);
+      }
+    });
+
+    test('should filter field suggestions after "ORDER BY p"', () => {
+      const input = 'ORDER BY p';
+      const tokens = parser.tokenize(input);
+      const context = suggestionEngine.getSuggestionContext(input, input.length, tokens);
+      const suggestions = suggestionEngine.getSuggestions(context);
+      
+      expect(context.inOrderBy).toBe(true);
+      expect(context.expectingField).toBe(true); // Still expecting field as 'p' is partial
+      const fieldSuggestions = suggestions.filter((s) => s.type === 'field' && s.value.startsWith('p'));
+      expect(fieldSuggestions.some((s) => s.value === 'project')).toBe(true);
+      expect(fieldSuggestions.some((s) => s.value === 'priority')).toBe(true);
+      expect(fieldSuggestions.some((s) => s.value === 'status')).toBe(false);
+    });
+
+    test('should suggest ASC/DESC after "ORDER BY priority "', () => {
+      const input = 'ORDER BY priority ';
+      const tokens = parser.tokenize(input);
+      const context = suggestionEngine.getSuggestionContext(input, input.length, tokens);
+      const suggestions = suggestionEngine.getSuggestions(context);
+
+      expect(context.inOrderBy).toBe(true);
+      // After a full field, we expect ASC/DESC or comma
+      const keywordSuggestions = suggestions.filter((s) => s.type === 'keyword');
+      expect(keywordSuggestions.some((s) => s.value === 'ASC')).toBe(true);
+      expect(keywordSuggestions.some((s) => s.value === 'DESC')).toBe(true);
+    });
+
+    test('should suggest comma after "ORDER BY priority DESC "', () => {
+      const input = 'ORDER BY priority DESC ';
+      const tokens = parser.tokenize(input);
+      const context = suggestionEngine.getSuggestionContext(input, input.length, tokens);
+      const suggestions = suggestionEngine.getSuggestions(context);
+      
+      expect(suggestions.some((s) => s.type === 'comma' && s.value === ',')).toBe(true);
+      // Also, logical operators might be suggested if ORDER BY is at the start of a sub-query part
+      // or if the query can continue with AND/OR.
+      // However, the primary expectation here for ORDER BY clause continuation is a comma.
+    });
+
+    test('should suggest fields after "ORDER BY priority DESC, "', () => {
+      const input = 'ORDER BY priority DESC, ';
+      const tokens = parser.tokenize(input);
+      const context = suggestionEngine.getSuggestionContext(input, input.length, tokens);
+      const suggestions = suggestionEngine.getSuggestions(context);
+
+      expect(context.inOrderBy).toBe(true);
+      expect(context.expectingField).toBe(true);
+      const fieldSuggestions = suggestions.filter((s) => s.type === 'field');
+      const sortableFields = testFields.filter(f => f.sortable !== false).map(f => f.name);
+      expect(fieldSuggestions.length).toBeGreaterThanOrEqual(sortableFields.length); // Could be more if filtering isn't perfect
+      for (const field of sortableFields) {
+        expect(fieldSuggestions.some((s) => s.value === field)).toBe(true);
+      }
+    });
+  });
+
+  test.describe('Complex Query Suggestions', () => {
+    test('should suggest fields after an opening parenthesis "( "', () => {
+      const input = '( ';
+      const tokens = parser.tokenize(input);
+      const context = suggestionEngine.getSuggestionContext(input, input.length, tokens);
+      const suggestions = suggestionEngine.getSuggestions(context);
+
+      expect(context.expectingField).toBe(true);
+      const fieldSuggestions = suggestions.filter(s => s.type === 'field');
+      expect(fieldSuggestions.length).toBeGreaterThan(0);
+      expect(fieldSuggestions.some(s => s.value === 'project')).toBe(true);
+      // Also check for function suggestions if allowFunctions is true
+      if (suggestionEngine['config'].allowFunctions) {
+        const functionSuggestions = suggestions.filter(s => s.type === 'function');
+        expect(functionSuggestions.length).toBeGreaterThan(0);
+        expect(functionSuggestions.some(s => s.value === 'currentUser')).toBe(true);
+      }
+    });
+
+    test('should suggest values in nested structures "(project = PROJ1 AND (status = "', () => {
+      const input = '(project = PROJ1 AND (status = ';
+      const tokens = parser.tokenize(input);
+      const context = suggestionEngine.getSuggestionContext(input, input.length, tokens);
+      const suggestions = suggestionEngine.getSuggestions(context);
+      
+      expect(context.expectingValue).toBe(true);
+      expect(context.lastField).toBe('status');
+      const valueSuggestions = suggestions.filter(s => s.type === 'value');
+      expect(valueSuggestions.length).toBeGreaterThan(0);
+      for (const value of expectedSuggestions.values.status) {
+        expect(valueSuggestions.some(s => s.value === value)).toBe(true);
+      }
+    });
+
+    test('should suggest fields or parenthesis after "NOT "', () => {
+      const input = 'NOT ';
+      const tokens = parser.tokenize(input);
+      const context = suggestionEngine.getSuggestionContext(input, input.length, tokens);
+      const suggestions = suggestionEngine.getSuggestions(context);
+
+      // After NOT, we can have a field or an opening parenthesis for a group
+      const fieldSuggestions = suggestions.filter(s => s.type === 'field');
+      expect(fieldSuggestions.length).toBeGreaterThan(0);
+      expect(fieldSuggestions.some(s => s.value === 'project')).toBe(true);
+      
+      const parenthesisSuggestion = suggestions.find(s => s.type === 'parenthesis' && s.value === '(');
+      expect(parenthesisSuggestion).toBeDefined();
+    });
+
+    test('should suggest fields after "NOT ("', () => {
+      const input = 'NOT (';
+      const tokens = parser.tokenize(input);
+      const context = suggestionEngine.getSuggestionContext(input, input.length, tokens);
+      const suggestions = suggestionEngine.getSuggestions(context);
+
+      expect(context.expectingField).toBe(true);
+      const fieldSuggestions = suggestions.filter(s => s.type === 'field');
+      expect(fieldSuggestions.length).toBeGreaterThan(0);
+      expect(fieldSuggestions.some(s => s.value === 'project')).toBe(true);
+    });
+
+    test('should suggest fields or parenthesis after "project = PROJ1 AND NOT "', () => {
+      const input = 'project = PROJ1 AND NOT ';
+      const tokens = parser.tokenize(input);
+      const context = suggestionEngine.getSuggestionContext(input, input.length, tokens);
+      const suggestions = suggestionEngine.getSuggestions(context);
+
+      const fieldSuggestions = suggestions.filter(s => s.type === 'field');
+      expect(fieldSuggestions.length).toBeGreaterThan(0);
+      expect(fieldSuggestions.some(s => s.value === 'project')).toBe(true);
+
+      const parenthesisSuggestion = suggestions.find(s => s.type === 'parenthesis' && s.value === '(');
+      expect(parenthesisSuggestion).toBeDefined();
+    });
+  });
 });
