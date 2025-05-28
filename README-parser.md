@@ -126,6 +126,8 @@ status = "open" AND assignee = currentUser() ORDER BY created DESC, priority ASC
 ### Functions
 
 Built-in functions for dynamic values:
+
+#### Parameterless Functions
 - `currentUser()` - Current user identifier
 - `now()` - Current timestamp
 - `today()` - Today's date
@@ -133,6 +135,38 @@ Built-in functions for dynamic values:
 - `endOfWeek()` - End of current week
 - `startOfMonth()` - Start of current month
 - `endOfMonth()` - End of current month
+
+#### Parameterized Functions
+- `daysAgo(days)` - Date N days ago from today
+  ```typescript
+  daysAgo(30)  // 30 days ago
+  daysAgo(7)   // 7 days ago
+  ```
+- `daysFromNow(days)` - Date N days from today
+  ```typescript
+  daysFromNow(14)  // 14 days from now
+  ```
+- `dateRange(start, end)` - Date range between two dates
+  ```typescript
+  dateRange("2023-01-01", "2023-12-31")
+  ```
+- `userInRole(role)` - Users with specific role
+  ```typescript
+  userInRole("admin")
+  userInRole("manager")
+  ```
+- `projectsWithPrefix(prefix)` - Projects with name prefix
+  ```typescript
+  projectsWithPrefix("PROJ")
+  projectsWithPrefix("DEV")
+  ```
+
+#### Function Usage in Queries
+Functions can be used in various contexts:
+- **Single conditions**: `created >= daysAgo(30)`
+- **IN lists**: `assignee IN (currentUser(), userInRole("admin"))`
+- **Complex expressions**: `(created >= daysAgo(30) AND assignee = currentUser()) OR priority = "High"`
+- **Nested functions**: `dateRange("2023-01-01", daysAgo(30))`
 
 ## 🔧 API Reference
 
@@ -204,15 +238,35 @@ const complex = parser.parse('(status = "open" OR status = "pending") AND assign
 ### Working with Functions
 
 ```typescript
-// Using built-in functions
+// Using parameterless functions
 const withFunctions = parser.parse(`
   assignee = currentUser() AND
   created >= startOfWeek() AND
   created <= endOfWeek()
 `);
 
+// Using parameterized functions
+const withParams = parser.parse(`
+  assignee = userInRole("admin") AND
+  created >= daysAgo(30) AND
+  updated <= daysFromNow(7)
+`);
+
+// Functions with multiple parameters
+const multiParam = parser.parse('created = dateRange("2023-01-01", "2023-12-31")');
+
 // Functions in lists
-const functionList = parser.parse('assignee IN (currentUser(), "john.doe", "jane.smith")');
+const functionList = parser.parse('assignee IN (currentUser(), userInRole("manager"), "john.doe")');
+
+// Nested function calls
+const nested = parser.parse('created = dateRange("2023-01-01", daysAgo(30))');
+
+// Complex expressions with functions
+const complex = parser.parse(`
+  (assignee = currentUser() OR assignee = userInRole("admin")) AND
+  created >= daysAgo(30) AND
+  project = projectsWithPrefix("PROJ")
+`);
 ```
 
 ### ORDER BY Clauses
@@ -252,6 +306,72 @@ if (query.where) {
   // Output: "status = "open" AND assignee = currentUser()"
 }
 ```
+
+### Function Configuration
+
+You can define custom functions with parameters in your configuration:
+
+```typescript
+const config: QLInputConfig = {
+  fields: [...],
+  allowFunctions: true,
+  functions: [
+    {
+      name: 'currentUser',
+      displayName: 'currentUser()',
+      description: 'Current logged in user',
+    },
+    {
+      name: 'daysAgo',
+      displayName: 'daysAgo(days)',
+      description: 'Date N days ago from today',
+      parameters: [{
+        name: 'days',
+        type: 'number',
+        required: true,
+        description: 'Number of days'
+      }]
+    },
+    {
+      name: 'userInRole',
+      displayName: 'userInRole(role)',
+      description: 'Users with specific role',
+      parameters: [{
+        name: 'role',
+        type: 'text',
+        required: true,
+        description: 'User role name'
+      }]
+    },
+    {
+      name: 'dateRange',
+      displayName: 'dateRange(start, end)',
+      description: 'Date range between two dates',
+      parameters: [
+        {
+          name: 'startDate',
+          type: 'date',
+          required: true,
+          description: 'Start date'
+        },
+        {
+          name: 'endDate',
+          type: 'date',
+          required: true,
+          description: 'End date'
+        }
+      ]
+    }
+  ]
+};
+```
+
+### Function Parameter Types
+
+- `text` - String parameters (quoted in queries)
+- `number` - Numeric parameters (unquoted)
+- `date` - Date parameters (quoted)
+- `boolean` - Boolean parameters (true/false)
 
 ### Error Handling
 

@@ -166,18 +166,8 @@ export class QLExpressionParser {
       // Check if this is a function call (token followed by parentheses)
       const nextToken = this.tokens[this.position + 1];
       if (nextToken && nextToken.type === 'parenthesis' && nextToken.value === '(') {
-        // This is a function call, include the parentheses
-        this.advance(); // consume function name
-        this.advance(); // consume opening parenthesis
-
-        // Look for closing parenthesis
-        const closingToken = this.current();
-        if (closingToken && closingToken.type === 'parenthesis' && closingToken.value === ')') {
-          this.advance(); // consume closing parenthesis
-          return value + '()';
-        } else {
-          throw new Error('Expected closing parenthesis for function call');
-        }
+        // This is a function call, parse it with potential parameters
+        return this.parseFunctionCall(value);
       }
 
       // Remove quotes if present (for regular values)
@@ -192,6 +182,65 @@ export class QLExpressionParser {
     throw new Error(`Expected value, got ${token.type} "${token.value}"`);
   }
 
+  private parseFunctionCall(functionName: string): string {
+    this.advance(); // consume function name
+    this.advance(); // consume opening parenthesis
+
+    const parameters: string[] = [];
+
+    // Parse parameters if any exist
+    while (this.current() && !(this.current()?.type === 'parenthesis' && this.current()?.value === ')')) {
+      const token = this.current();
+
+      if (
+        token?.type === 'value' ||
+        token?.type === 'field' ||
+        token?.type === 'function' ||
+        token?.type === 'unknown'
+      ) {
+        let paramValue = token.value;
+
+        // Check if this parameter is also a function call
+        const nextToken = this.tokens[this.position + 1];
+        if (nextToken && nextToken.type === 'parenthesis' && nextToken.value === '(') {
+          // Recursive function call
+          paramValue = this.parseFunctionCall(paramValue);
+        } else {
+          // Regular parameter - remove quotes if present
+          if (
+            (paramValue.startsWith('"') && paramValue.endsWith('"')) ||
+            (paramValue.startsWith("'") && paramValue.endsWith("'"))
+          ) {
+            paramValue = paramValue.slice(1, -1);
+          }
+          this.advance();
+        }
+
+        parameters.push(paramValue);
+
+        // Skip comma if present
+        if (this.current()?.type === 'comma') {
+          this.advance();
+        }
+      } else {
+        throw new Error(`Unexpected token in function parameters: ${token?.type} "${token?.value}"`);
+      }
+    }
+
+    // Expect closing parenthesis
+    if (this.current()?.type !== 'parenthesis' || this.current()?.value !== ')') {
+      throw new Error('Expected closing parenthesis for function call');
+    }
+    this.advance(); // consume closing parenthesis
+
+    // Return function call with parameters
+    if (parameters.length === 0) {
+      return `${functionName}()`;
+    } else {
+      return `${functionName}(${parameters.join(', ')})`;
+    }
+  }
+
   private parseInList(): string[] {
     // Expect opening parenthesis
     if (this.current()?.type !== 'parenthesis' || this.current()?.value !== '(') {
@@ -204,24 +253,19 @@ export class QLExpressionParser {
     while (this.current() && !(this.current()?.type === 'parenthesis' && this.current()?.value === ')')) {
       const token = this.current();
 
-      if (token?.type === 'value' || token?.type === 'field' || token?.type === 'function' || token?.type === 'unknown') {
+      if (
+        token?.type === 'value' ||
+        token?.type === 'field' ||
+        token?.type === 'function' ||
+        token?.type === 'unknown'
+      ) {
         let value = token.value;
 
         // Check if this is a function call (token followed by parentheses)
         const nextToken = this.tokens[this.position + 1];
         if (nextToken && nextToken.type === 'parenthesis' && nextToken.value === '(') {
-          // This is a function call, include the parentheses
-          this.advance(); // consume function name
-          this.advance(); // consume opening parenthesis
-
-          // Look for closing parenthesis
-          const closingToken = this.current();
-          if (closingToken && closingToken.type === 'parenthesis' && closingToken.value === ')') {
-            this.advance(); // consume closing parenthesis
-            value = value + '()';
-          } else {
-            throw new Error('Expected closing parenthesis for function call in IN list');
-          }
+          // This is a function call, parse it with potential parameters
+          value = this.parseFunctionCall(value);
         } else {
           // Remove quotes if present (for regular values)
           if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {

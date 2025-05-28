@@ -140,6 +140,78 @@ const sampleFunctions: QLFunction[] = [
     displayName: 'endOfWeek()',
     description: 'Returns the end of the current week',
   },
+  // New parameterized functions
+  {
+    name: 'daysAgo',
+    displayName: 'daysAgo(days)',
+    description: 'Returns a date N days ago from today',
+    parameters: [
+      {
+        name: 'days',
+        type: 'number',
+        required: true,
+        description: 'Number of days to go back',
+      },
+    ],
+  },
+  {
+    name: 'daysFromNow',
+    displayName: 'daysFromNow(days)',
+    description: 'Returns a date N days from today',
+    parameters: [
+      {
+        name: 'days',
+        type: 'number',
+        required: true,
+        description: 'Number of days from today',
+      },
+    ],
+  },
+  {
+    name: 'dateRange',
+    displayName: 'dateRange(start, end)',
+    description: 'Returns a date range between two dates',
+    parameters: [
+      {
+        name: 'startDate',
+        type: 'date',
+        required: true,
+        description: 'Start date (YYYY-MM-DD format)',
+      },
+      {
+        name: 'endDate',
+        type: 'date',
+        required: true,
+        description: 'End date (YYYY-MM-DD format)',
+      },
+    ],
+  },
+  {
+    name: 'userInRole',
+    displayName: 'userInRole(role)',
+    description: 'Returns users with the specified role',
+    parameters: [
+      {
+        name: 'role',
+        type: 'text',
+        required: true,
+        description: 'User role (admin, manager, developer, etc.)',
+      },
+    ],
+  },
+  {
+    name: 'projectsWithPrefix',
+    displayName: 'projectsWithPrefix(prefix)',
+    description: 'Returns projects that start with the given prefix',
+    parameters: [
+      {
+        name: 'prefix',
+        type: 'text',
+        required: true,
+        description: 'Project name prefix',
+      },
+    ],
+  },
 ];
 
 const config: QLInputConfig = {
@@ -227,6 +299,14 @@ export function QLDemo() {
     'summary ~ "bug" AND status NOT IN (Done, Closed)',
     '(project = PROJ1 OR project = PROJ2) AND assignee IS NOT EMPTY',
     'project = PROJ1 and status = Open or priority = High', // lowercase operators
+    // New parameterized function examples
+    'assignee = currentUser() AND created >= daysAgo(30)',
+    'assignee = userInRole("admin") AND status = Open',
+    'created >= daysAgo(7) AND updated <= daysFromNow(1)',
+    'created = dateRange("2023-01-01", "2023-12-31")',
+    'project = projectsWithPrefix("PROJ") AND assignee = currentUser()',
+    'assignee IN (currentUser(), userInRole("manager")) AND priority = High',
+    '(created >= daysAgo(30) AND assignee = currentUser()) OR priority = Highest',
   ];
 
   return (

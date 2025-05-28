@@ -13,6 +13,9 @@ This example demonstrates how to use `@abaktiar/ql-input` in a React application
 - Query parsing and conversion to different formats
 - Example queries for common use cases
 - Responsive design and modern UI
+- **NEW**: Parameterized functions with interactive autocomplete
+- **NEW**: Parameter placeholders and type validation
+- **NEW**: Functions in complex expressions and IN lists
 
 ## 📦 Installation
 
@@ -123,12 +126,13 @@ const config: QLInputConfig = {
 ### Example Queries
 Pre-built examples covering:
 - Simple status filtering
-- Function usage (`currentUser()`, `startOfWeek()`)
-- Complex grouping with parentheses
-- Text search with date filtering
-- Unassigned item queries
+- Function usage (`currentUser()`, `daysAgo(7)`, `userInRole("admin")`)
+- Complex grouping with parameterized functions
+- Text search with date filtering using `daysAgo(30)`
+- Role-based filtering with `userInRole("manager")`
+- Functions in IN lists: `assignee IN (currentUser(), userInRole("admin"))`
 - Tag-based filtering with sorting
-- Advanced multi-condition queries
+- Advanced multi-condition queries with parameterized functions
 
 ## 🔄 Async Suggestions
 
@@ -206,6 +210,9 @@ Built-in functions:
 - `today()` - Today's date
 - `startOfWeek()` / `endOfWeek()` - Week boundaries
 - `startOfMonth()` / `endOfMonth()` - Month boundaries
+- **NEW**: `daysAgo(days)` - Date N days ago (parameterized)
+- **NEW**: `userInRole(role)` - Users with specific role (parameterized)
+- **NEW**: `dateRange(start, end)` - Date range queries (parameterized)
 
 ## 🚀 Next Steps
 

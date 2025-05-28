@@ -53,6 +53,64 @@ const config = {
       ]
     }
   ],
+  functions: [
+    {
+      name: 'currentUser',
+      displayName: 'currentUser()',
+      description: 'Returns the current logged-in user'
+    },
+    {
+      name: 'now',
+      displayName: 'now()',
+      description: 'Returns the current date and time'
+    },
+    {
+      name: 'startOfWeek',
+      displayName: 'startOfWeek()',
+      description: 'Returns the start of the current week'
+    },
+    {
+      name: 'daysAgo',
+      displayName: 'daysAgo(days)',
+      description: 'Returns a date N days ago from today',
+      parameters: [{
+        name: 'days',
+        type: 'number',
+        required: true,
+        description: 'Number of days'
+      }]
+    },
+    {
+      name: 'userInRole',
+      displayName: 'userInRole(role)',
+      description: 'Returns users with specific role',
+      parameters: [{
+        name: 'role',
+        type: 'text',
+        required: true,
+        description: 'User role name'
+      }]
+    },
+    {
+      name: 'dateRange',
+      displayName: 'dateRange(start, end)',
+      description: 'Creates a date range query',
+      parameters: [
+        {
+          name: 'start',
+          type: 'date',
+          required: true,
+          description: 'Start date'
+        },
+        {
+          name: 'end',
+          type: 'date',
+          required: true,
+          description: 'End date'
+        }
+      ]
+    }
+  ],
   maxSuggestions: 10,
   caseSensitive: false,
   allowParentheses: true,
@@ -68,10 +126,13 @@ const testQueries = [
   'status = "open"',
   'status = "open" AND assignee = currentUser()',
   '(status = "open" OR status = "pending") AND priority >= 3',
-  'title ~ "urgent" AND created >= startOfWeek()',
+  'title ~ "urgent" AND created >= daysAgo(7)',
+  'assignee = userInRole("admin") AND priority >= 3',
   'assignee IS EMPTY AND priority = 4',
   'tags IN ("bug", "critical") ORDER BY created DESC',
-  'status IN ("open", "pending") AND (assignee = currentUser() OR assignee IS EMPTY) ORDER BY priority DESC, created ASC'
+  'status IN ("open", "pending") AND (assignee = currentUser() OR assignee = userInRole("manager")) ORDER BY priority DESC, created ASC',
+  'created >= daysAgo(30) AND status = "open"',
+  'assignee IN (currentUser(), userInRole("admin")) AND priority >= daysAgo(1)'
 ];
 
 console.log('🚀 QL Parser Examples\n');

@@ -8,7 +8,8 @@ This directory contains comprehensive Playwright tests for the QL Input componen
 tests/
 ├── unit/                    # Unit tests for individual components
 │   ├── ql-parser.test.ts   # Parser logic tests
-│   └── ql-suggestions.test.ts # Suggestion engine tests
+│   ├── ql-suggestions.test.ts # Suggestion engine tests
+│   └── ql-parameterized-functions.test.ts # Parameterized functions tests
 ├── integration/             # Integration tests for component interactions
 │   ├── ql-input-basic.test.ts # Basic input functionality
 │   └── ql-input-in-operator.test.ts # IN operator specific tests
@@ -64,6 +65,13 @@ npm run test:report      # View HTML test report
   - Context detection (IN lists, ORDER BY)
   - Filtering and auto-quoting
   - Function suggestions
+
+- **ql-parameterized-functions.test.ts**: Tests parameterized functions
+  - Function parsing with parameters (e.g., `daysAgo(30)`, `userInRole("admin")`)
+  - Parameter type validation and requirements
+  - Complex function expressions in various contexts
+  - Function autocomplete with parameter placeholders
+  - Error handling for malformed function calls
 
 ### Integration Tests
 - **ql-input-basic.test.ts**: Tests basic component functionality
@@ -162,7 +170,9 @@ Additional test constants in `tests/test.config.ts`:
 - ✅ Value suggestions and auto-quoting
 - ✅ IN operator multi-value selection
 - ✅ Logical operator combinations
-- ✅ Function integration
+- ✅ Function integration (parameterless and parameterized)
+- ✅ Parameterized function calls with type validation
+- ✅ Function autocomplete with parameter placeholders
 - ✅ ORDER BY clause handling
 - ✅ Query parsing and validation
 - ✅ Error handling and recovery

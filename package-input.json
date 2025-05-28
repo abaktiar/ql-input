@@ -1,7 +1,7 @@
 {
   "name": "@abaktiar/ql-input",
-  "version": "1.3.1",
-  "description": "React QL input component with intelligent autocomplete and query validation. Framework-independent with zero external dependencies.",
+  "version": "1.4.0",
+  "description": "React QL input component with intelligent autocomplete, parameterized functions, and query validation. Framework-independent with zero external dependencies.",
   "main": "./index.js",
   "module": "./index.mjs",
   "types": "./index.d.ts",
@@ -23,7 +23,9 @@
     "shadcn",
     "ui-component",
     "query-builder",
-    "validation"
+    "parameterized-functions",
+    "validation",
+    "jql"
   ],
   "author": "abaktiar",
   "license": "MIT",

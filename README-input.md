@@ -21,7 +21,7 @@ A comprehensive React QL (Query Language) input component with intelligent autoc
 
 ### Advanced Features
 - 🌐 **Async value suggestions** - Server-side value fetching with debouncing
-- 🔄 **Function support** - Built-in functions like `currentUser()`, `now()`, etc.
+- 🔄 **Function support** - Built-in functions like `currentUser()`, `now()`, and parameterized functions like `daysAgo(30)`, `userInRole("admin")`
 - 📊 **ORDER BY clauses** - Sorting with ASC/DESC support
 - 🌙 **Dark mode** - Full theming support
 - ♿ **Accessibility** - ARIA attributes for screen readers
@@ -232,15 +232,49 @@ const configWithFunctions: QLInputConfig = {
   functions: [
     {
       name: 'currentUser',
-      displayName: 'Current User',
+      displayName: 'currentUser()',
       description: 'The currently logged-in user',
-      returnType: 'user'
     },
     {
-      name: 'myCustomFunction',
-      displayName: 'My Custom Function',
-      description: 'A custom function for demo',
-      returnType: 'text'
+      name: 'daysAgo',
+      displayName: 'daysAgo(days)',
+      description: 'Date N days ago from today',
+      parameters: [{
+        name: 'days',
+        type: 'number',
+        required: true,
+        description: 'Number of days'
+      }]
+    },
+    {
+      name: 'userInRole',
+      displayName: 'userInRole(role)',
+      description: 'Users with specific role',
+      parameters: [{
+        name: 'role',
+        type: 'text',
+        required: true,
+        description: 'User role name'
+      }]
+    },
+    {
+      name: 'dateRange',
+      displayName: 'dateRange(start, end)',
+      description: 'Date range between two dates',
+      parameters: [
+        {
+          name: 'startDate',
+          type: 'date',
+          required: true,
+          description: 'Start date'
+        },
+        {
+          name: 'endDate',
+          type: 'date',
+          required: true,
+          description: 'End date'
+        }
+      ]
     }
   ]
 };
@@ -249,10 +283,60 @@ function CustomFunctionsExample() {
   return (
     <QLInput
       config={configWithFunctions}
-      placeholder="Use functions like currentUser()..."
+      placeholder="Try: assignee = userInRole(&quot;admin&quot;) AND created >= daysAgo(30)"
     />
   );
 }
+```
+
+## 🎯 Query Examples
+
+The component supports powerful QL queries with parameterized functions:
+
+### Basic Function Queries
+```sql
+-- User functions
+assignee = currentUser()
+assignee = userInRole("admin")
+assignee IN (currentUser(), userInRole("manager"))
+
+-- Date functions
+created >= daysAgo(30)
+updated <= daysFromNow(7)
+created = dateRange("2023-01-01", "2023-12-31")
+
+-- Project functions
+project = projectsWithPrefix("PROJ")
+```
+
+### Complex Expressions
+```sql
+-- Combined conditions with functions
+assignee = currentUser() AND created >= daysAgo(30)
+
+-- Functions in IN lists
+assignee IN (currentUser(), userInRole("admin")) AND priority = High
+
+-- Complex grouping with functions
+(created >= daysAgo(30) AND assignee = currentUser()) OR priority = Highest
+
+-- Multiple function parameters
+created = dateRange("2023-01-01", daysAgo(90)) AND status = Open
+```
+
+### Real-World Use Cases
+```sql
+-- Find my recent work
+assignee = currentUser() AND updated >= daysAgo(7)
+
+-- Admin oversight
+assignee = userInRole("admin") AND status = "In Progress"
+
+-- Project timeline queries
+project = projectsWithPrefix("PROJ") AND created >= dateRange("2023-01-01", "2023-12-31")
+
+-- Team management
+assignee IN (userInRole("developer"), userInRole("qa")) AND priority >= High
 ```
 
 ### Form Integration
@@ -644,21 +728,40 @@ const fullConfig: QLInputConfig = {
   functions: [
     {
       name: 'currentUser',
-      displayName: 'Current User',
+      displayName: 'currentUser()',
       description: 'The currently logged-in user',
-      returnType: 'user'
     },
     {
       name: 'now',
-      displayName: 'Now',
+      displayName: 'now()',
       description: 'Current date and time',
-      returnType: 'datetime'
     },
     {
       name: 'today',
-      displayName: 'Today',
+      displayName: 'today()',
       description: 'Today\'s date',
-      returnType: 'date'
+    },
+    {
+      name: 'daysAgo',
+      displayName: 'daysAgo(days)',
+      description: 'Date N days ago from today',
+      parameters: [{
+        name: 'days',
+        type: 'number',
+        required: true,
+        description: 'Number of days'
+      }]
+    },
+    {
+      name: 'userInRole',
+      displayName: 'userInRole(role)',
+      description: 'Users with specific role',
+      parameters: [{
+        name: 'role',
+        type: 'text',
+        required: true,
+        description: 'User role name'
+      }]
     }
   ]
 };

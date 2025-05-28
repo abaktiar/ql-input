@@ -11,6 +11,8 @@ This example demonstrates how to use `@abaktiar/ql-parser` in a Node.js environm
 - Tokenization and error handling
 - Working with different field types and operators
 - Complex queries with parentheses and ORDER BY clauses
+- **NEW**: Parameterized functions with type validation (`daysAgo(30)`, `userInRole("admin")`)
+- **NEW**: Functions in IN lists and complex expressions
 
 ## 📦 Installation
 
@@ -38,7 +40,13 @@ The demo includes these example queries:
 1. **Simple condition**: `status = "open"`
 2. **Function usage**: `status = "open" AND assignee = currentUser()`
 3. **Complex grouping**: `(status = "open" OR status = "pending") AND priority >= 3`
-4. **Text search**: `title ~ "urgent" AND created >= startOfWeek()`
+4. **Parameterized function**: `title ~ "urgent" AND created >= daysAgo(7)`
+5. **Role-based filtering**: `assignee = userInRole("admin") AND priority >= 3`
+6. **Empty checks**: `assignee IS EMPTY AND priority = 4`
+7. **IN operator with tags**: `tags IN ("bug", "critical") ORDER BY created DESC`
+8. **Complex functions**: `status IN ("open", "pending") AND (assignee = currentUser() OR assignee = userInRole("manager")) ORDER BY priority DESC, created ASC`
+9. **Date calculations**: `created >= daysAgo(30) AND status = "open"`
+10. **Functions in IN lists**: `assignee IN (currentUser(), userInRole("admin")) AND priority >= daysAgo(1)`
 5. **Empty checks**: `assignee IS EMPTY AND priority = 4`
 6. **List operations**: `tags IN ("bug", "critical") ORDER BY created DESC`
 7. **Advanced query**: `status IN ("open", "pending") AND (assignee = currentUser() OR assignee IS EMPTY) ORDER BY priority DESC, created ASC`

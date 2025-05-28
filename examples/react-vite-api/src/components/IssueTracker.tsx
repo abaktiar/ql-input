@@ -98,6 +98,64 @@ const config: QLInputConfig = {
       ]
     }
   ],
+  functions: [
+    {
+      name: 'currentUser',
+      displayName: 'currentUser()',
+      description: 'Returns the current logged-in user'
+    },
+    {
+      name: 'now',
+      displayName: 'now()',
+      description: 'Returns the current date and time'
+    },
+    {
+      name: 'startOfWeek',
+      displayName: 'startOfWeek()',
+      description: 'Returns the start of the current week'
+    },
+    {
+      name: 'daysAgo',
+      displayName: 'daysAgo(days)',
+      description: 'Returns a date N days ago from today',
+      parameters: [{
+        name: 'days',
+        type: 'number',
+        required: true,
+        description: 'Number of days'
+      }]
+    },
+    {
+      name: 'userInRole',
+      displayName: 'userInRole(role)',
+      description: 'Returns users with specific role',
+      parameters: [{
+        name: 'role',
+        type: 'text',
+        required: true,
+        description: 'User role name'
+      }]
+    },
+    {
+      name: 'dateRange',
+      displayName: 'dateRange(start, end)',
+      description: 'Creates a date range query',
+      parameters: [
+        {
+          name: 'start',
+          type: 'date',
+          required: true,
+          description: 'Start date'
+        },
+        {
+          name: 'end',
+          type: 'date',
+          required: true,
+          description: 'End date'
+        }
+      ]
+    }
+  ],
   maxSuggestions: 10,
   caseSensitive: false,
   allowParentheses: true,

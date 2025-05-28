@@ -85,6 +85,64 @@ const config: QLInputConfig = {
       ]
     }
   ],
+  functions: [
+    {
+      name: 'currentUser',
+      displayName: 'currentUser()',
+      description: 'Returns the current logged-in user'
+    },
+    {
+      name: 'now',
+      displayName: 'now()',
+      description: 'Returns the current date and time'
+    },
+    {
+      name: 'startOfWeek',
+      displayName: 'startOfWeek()',
+      description: 'Returns the start of the current week'
+    },
+    {
+      name: 'daysAgo',
+      displayName: 'daysAgo(days)',
+      description: 'Returns a date N days ago from today',
+      parameters: [{
+        name: 'days',
+        type: 'number',
+        required: true,
+        description: 'Number of days'
+      }]
+    },
+    {
+      name: 'userInRole',
+      displayName: 'userInRole(role)',
+      description: 'Returns users with specific role',
+      parameters: [{
+        name: 'role',
+        type: 'text',
+        required: true,
+        description: 'User role name'
+      }]
+    },
+    {
+      name: 'dateRange',
+      displayName: 'dateRange(start, end)',
+      description: 'Creates a date range query',
+      parameters: [
+        {
+          name: 'start',
+          type: 'date',
+          required: true,
+          description: 'Start date'
+        },
+        {
+          name: 'end',
+          type: 'date',
+          required: true,
+          description: 'End date'
+        }
+      ]
+    }
+  ],
   maxSuggestions: 10,
   caseSensitive: false,
   allowParentheses: true,
@@ -105,19 +163,29 @@ const exampleQueries = [
     query: 'assignee = currentUser()'
   },
   {
+    title: 'Recent Items (Last 7 Days)',
+    description: 'Items created in the last 7 days',
+    query: 'created >= daysAgo(7)'
+  },
+  {
+    title: 'Admin Role Items',
+    description: 'Items assigned to admin users',
+    query: 'assignee = userInRole("admin")'
+  },
+  {
     title: 'High Priority Open Items',
     description: 'Open items with high priority',
     query: 'status = "open" AND priority >= 3'
   },
   {
-    title: 'Complex Grouping',
-    description: 'Multiple conditions with grouping',
-    query: '(status = "open" OR status = "pending") AND assignee = currentUser()'
+    title: 'Complex Grouping with Functions',
+    description: 'Multiple conditions with parameterized functions',
+    query: '(status = "open" OR status = "pending") AND assignee IN (currentUser(), userInRole("manager"))'
   },
   {
-    title: 'Text Search with Date',
-    description: 'Search title and filter by date',
-    query: 'title ~ "urgent" AND created >= startOfWeek()'
+    title: 'Recent Urgent Items',
+    description: 'Search title and filter by recent date',
+    query: 'title ~ "urgent" AND created >= daysAgo(30)'
   },
   {
     title: 'Unassigned Critical Items',

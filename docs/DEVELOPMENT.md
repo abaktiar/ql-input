@@ -102,17 +102,38 @@ const config: QLInputConfig = {
   functions: [
     {
       name: 'currentUser',
-      displayName: 'Current User',
+      displayName: 'currentUser()',
       description: 'Returns the current logged-in user',
-      returnType: 'string'
+    },
+    {
+      name: 'daysAgo',
+      displayName: 'daysAgo(days)',
+      description: 'Returns a date N days ago from today',
+      parameters: [{
+        name: 'days',
+        type: 'number',
+        required: true,
+        description: 'Number of days'
+      }]
+    },
+    {
+      name: 'userInRole',
+      displayName: 'userInRole(role)',
+      description: 'Returns users with specific role',
+      parameters: [{
+        name: 'role',
+        type: 'text',
+        required: true,
+        description: 'User role name'
+      }]
     }
   ]
 };
 
 const parser = new QLParser(config);
 
-// Parse a query
-const query = parser.parse('status = "open" AND assignee = currentUser() ORDER BY created DESC');
+// Parse a query with parameterized functions
+const query = parser.parse('assignee = userInRole("admin") AND created >= daysAgo(30) ORDER BY created DESC');
 
 console.log(query);
 // {
@@ -252,6 +273,47 @@ const advancedConfig: QLInputConfig = {
       displayName: 'Current Time',
       description: 'Returns the current date and time',
       returnType: 'date'
+    },
+    {
+      name: 'daysAgo',
+      displayName: 'daysAgo(days)',
+      description: 'Returns a date N days ago from today',
+      parameters: [{
+        name: 'days',
+        type: 'number',
+        required: true,
+        description: 'Number of days'
+      }]
+    },
+    {
+      name: 'userInRole',
+      displayName: 'userInRole(role)',
+      description: 'Returns users with specific role',
+      parameters: [{
+        name: 'role',
+        type: 'text',
+        required: true,
+        description: 'User role name'
+      }]
+    },
+    {
+      name: 'dateRange',
+      displayName: 'dateRange(start, end)',
+      description: 'Creates a date range query',
+      parameters: [
+        {
+          name: 'start',
+          type: 'date',
+          required: true,
+          description: 'Start date'
+        },
+        {
+          name: 'end',
+          type: 'date',
+          required: true,
+          description: 'End date'
+        }
+      ]
     }
   ],
 

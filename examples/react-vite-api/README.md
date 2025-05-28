@@ -13,6 +13,9 @@ This is a comprehensive full-stack example demonstrating how to use `@abaktiar/q
 - **Issue tracking system** - Real-world use case implementation
 - **Interactive playground** - Query testing and experimentation
 - **API documentation** - Complete endpoint documentation with testing
+- **NEW**: Parameterized functions with backend integration
+- **NEW**: Function parameter validation and processing
+- **NEW**: Complex function expressions in production scenarios
 
 ## 🏗️ Architecture
 
@@ -181,6 +184,24 @@ tags NOT IN ("documentation", "feature")
 
 -- Text search with status filter
 title ~ "bug" AND status != "closed"
+```
+
+### Parameterized Functions (NEW)
+```sql
+-- Date-based filtering with parameters
+created >= daysAgo(30)
+created >= daysAgo(7) AND status = "open"
+
+-- Role-based user filtering
+assignee = userInRole("admin")
+assignee = userInRole("manager") AND priority >= 3
+
+-- Functions in IN lists
+assignee IN (currentUser(), userInRole("admin"))
+assignee IN (userInRole("manager"), userInRole("lead"))
+
+-- Complex function expressions
+(assignee = userInRole("admin") OR assignee = currentUser()) AND created >= daysAgo(14)
 ```
 
 ### Sorting Examples

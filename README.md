@@ -172,14 +172,26 @@ project = PROJ1 AND status = "In Progress"
 # User functions
 assignee = currentUser() AND priority IN (High, Highest)
 
+# Parameterized functions with arguments
+assignee = currentUser() AND created >= daysAgo(30)
+assignee = userInRole("admin") AND status = Open
+created >= daysAgo(7) AND updated <= daysFromNow(1)
+
+# Functions with multiple parameters
+created = dateRange("2023-01-01", "2023-12-31")
+project = projectsWithPrefix("PROJ") AND assignee = currentUser()
+
+# Functions in IN lists
+assignee IN (currentUser(), userInRole("manager")) AND priority = High
+
 # Date functions with ordering
 created >= startOfWeek() ORDER BY priority DESC
 
 # Text search
 summary ~ "bug" AND status != Done
 
-# Complex grouping
-(project = PROJ1 OR project = PROJ2) AND assignee IS NOT EMPTY
+# Complex grouping with functions
+(created >= daysAgo(30) AND assignee = currentUser()) OR priority = Highest
 ```
 
 ## ⌨️ Keyboard Shortcuts
@@ -212,12 +224,20 @@ summary ~ "bug" AND status != Done
 
 ### Built-in Functions
 
+#### Parameterless Functions
 - `currentUser()` - Current logged-in user
 - `now()` - Current date/time
 - `startOfDay()` - Start of current day
 - `endOfDay()` - End of current day
 - `startOfWeek()` - Start of current week
 - `endOfWeek()` - End of current week
+
+#### Parameterized Functions
+- `daysAgo(days)` - Date N days ago from today (e.g., `daysAgo(30)`)
+- `daysFromNow(days)` - Date N days from today (e.g., `daysFromNow(7)`)
+- `dateRange(start, end)` - Date range between two dates (e.g., `dateRange("2023-01-01", "2023-12-31")`)
+- `userInRole(role)` - Users with specific role (e.g., `userInRole("admin")`)
+- `projectsWithPrefix(prefix)` - Projects with name prefix (e.g., `projectsWithPrefix("PROJ")`)
 
 ## 🏗️ Development Guide
 

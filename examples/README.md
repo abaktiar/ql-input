@@ -10,16 +10,19 @@ This folder contains practical examples demonstrating how to use `@abaktiar/ql-p
 - Framework-agnostic usage of `@abaktiar/ql-parser`
 - Node.js backend integration
 - Query parsing and conversion examples
+- **NEW**: Parameterized functions demonstrations (`daysAgo(30)`, `userInRole("admin")`)
 
 ### 2. **React Component** (`react-component/`)
 - Complete React application using `@abaktiar/ql-input`
 - Interactive demo with live query building
 - Real-time validation and suggestions
+- **NEW**: Enhanced function autocomplete with parameter placeholders
 
 ### 3. **React + Vite + API** (`react-vite-api/`)
 - Full-stack React application with Vite
 - Mock API server integration
 - Advanced async suggestions and query processing
+- **NEW**: Full parameterized function integration with backend support
 
 ## 🚀 Quick Start
 
@@ -50,6 +53,27 @@ npm start
 - **ORDER BY clauses** - Sorting and ordering
 - **API integration** - Backend query processing
 - **TypeScript usage** - Full type safety examples
+
+## 🆕 New Features Highlighted
+
+All examples have been updated to showcase the latest **Parameterized Functions** feature:
+
+### Parameterized Function Examples
+- `daysAgo(30)` - Date calculations with parameters
+- `userInRole("admin")` - Role-based user filtering
+- `dateRange("start", "end")` - Date range queries
+- `assignee IN (currentUser(), userInRole("manager"))` - Functions in IN lists
+
+### Enhanced Autocomplete
+- Function suggestions with parameter placeholders
+- Parameter type validation and descriptions
+- Context-aware function recommendations
+- Improved error handling for function syntax
+
+### Real-World Use Cases
+- **Recent items**: `created >= daysAgo(7)`
+- **Role-based filtering**: `assignee = userInRole("admin")`
+- **Complex queries**: `(status = "open" OR status = "pending") AND assignee IN (currentUser(), userInRole("manager"))`
 
 ## 🔗 Package Links
 

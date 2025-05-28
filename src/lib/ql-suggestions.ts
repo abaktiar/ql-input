@@ -225,14 +225,52 @@ export class QLSuggestionEngine {
   private getFunctionSuggestions(): QLSuggestion[] {
     if (!this.config.functions) return [];
 
-    return this.config.functions.map((func) => ({
-      type: 'function' as const,
-      value: func.name,
-      displayValue: func.displayName || func.name,
-      description: func.description,
-      insertText: `${func.name}()`,
-      category: 'Functions',
-    }));
+    return this.config.functions.map((func) => {
+      // Check if function has parameters
+      const hasParameters = func.parameters && func.parameters.length > 0;
+
+      let insertText: string;
+      let displayValue: string;
+
+      if (hasParameters) {
+        // Generate parameter placeholders for parameterized functions
+        const paramPlaceholders = func.parameters!.map((param) => {
+          // Create placeholder based on parameter type
+          let placeholder: string;
+          switch (param.type) {
+            case 'text':
+              placeholder = param.required ? `"${param.name}"` : `"${param.name}?"`;
+              break;
+            case 'number':
+              placeholder = param.required ? param.name : `${param.name}?`;
+              break;
+            case 'date':
+            case 'datetime':
+              placeholder = param.required ? `"YYYY-MM-DD"` : `"YYYY-MM-DD?"`;
+              break;
+            default:
+              placeholder = param.required ? param.name : `${param.name}?`;
+          }
+          return placeholder;
+        });
+
+        insertText = `${func.name}(${paramPlaceholders.join(', ')})`;
+        displayValue = func.displayName || `${func.name}(${func.parameters?.map((p) => p.name).join(', ') || ''})`;
+      } else {
+        // Parameter-less functions
+        insertText = `${func.name}()`;
+        displayValue = func.displayName || `${func.name}()`;
+      }
+
+      return {
+        type: 'function' as const,
+        value: func.name,
+        displayValue: displayValue,
+        description: func.description,
+        insertText: insertText,
+        category: 'Functions',
+      };
+    });
   }
 
   /**
