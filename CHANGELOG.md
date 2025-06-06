@@ -16,6 +16,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Less Intrusive**: More controlled query-building experience without overwhelming suggestions
   - **State Management**: Added `justSelectedSuggestion` flag to track suggestion selection state
 
+- **Smooth & Minimal Visual Design**: Optimized suggestion appearance and performance
+  - **Faster Transitions**: Reduced transition times from 200ms to 80ms for snappy feel
+  - **Minimal Selection State**: Clean, subtle background with blue border instead of heavy highlighting
+  - **Smooth Border Animation**: Added transparent borders for seamless transition effects
+  - **Optimized CSS**: Specific transitions only for background, color, and border properties
+  - **Theme-aware Colors**: Beautiful minimal colors for both light and dark themes
+  - **Consistent Interaction**: Mouse hover and keyboard navigation use identical visual states
+
+- **Enhanced Keyboard Navigation**: Improved accessibility and usability
+  - **Auto-scroll to Selection**: Selected suggestions automatically scroll into view during keyboard navigation
+  - **Smooth Scrolling**: Added CSS and JavaScript smooth scrolling for polished experience
+  - **No Hidden Items**: All suggestions are accessible via keyboard, regardless of list length
+  - **Seamless UX**: Navigate through long suggestion lists without manual scrolling
+
 - **Parameterized Functions Support**: Enhanced function system with parameter support
   - Functions can now accept parameters: `daysAgo(30)`, `userInRole("admin")`, `dateRange("start", "end")`
   - Parameter type validation (text, number, date, boolean)

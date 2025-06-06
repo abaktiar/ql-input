@@ -12,6 +12,12 @@
   --ql-input-success: #38a169;
   --ql-input-warning: #d69e2e;
 
+  /* Suggestion hover/selection colors - minimal and sleek */
+  --ql-suggestion-hover: #e2e8f0;
+  --ql-suggestion-selected: #f1f5f9;
+  --ql-suggestion-selected-text: #0f172a;
+  --ql-suggestion-selected-border: #3b82f6;
+
   /* Spacing and sizing */
   --ql-input-radius: 0.375rem;
   --ql-input-radius-lg: 0.5rem;
@@ -31,7 +37,8 @@
   --ql-input-shadow-focus: 0 0 0 3px rgba(49, 130, 206, 0.1);
 
   /* Transitions */
-  --ql-input-transition: all 0.2s ease-in-out;
+  --ql-input-transition: all 0.12s ease-out;
+  --ql-suggestion-transition: background-color 0.08s ease-out, color 0.08s ease-out, border 0.08s ease-out;
 }
 
 /* Dark theme */
@@ -47,6 +54,12 @@
   --ql-input-destructive: #fc8181;
   --ql-input-success: #68d391;
   --ql-input-warning: #f6e05e;
+
+  /* Dark theme suggestion hover/selection colors - minimal and sleek */
+  --ql-suggestion-hover: #4b5563;
+  --ql-suggestion-selected: #374151;
+  --ql-suggestion-selected-text: #f9fafb;
+  --ql-suggestion-selected-border: #60a5fa;
 }
 
 /* Container for the entire QL Input component */
@@ -213,6 +226,7 @@
   max-height: 300px;
   overflow-y: auto;
   padding: var(--ql-input-spacing-xs);
+  scroll-behavior: smooth;
 }
 
 .ql-suggestion-item {
@@ -222,15 +236,21 @@
   cursor: pointer;
   color: var(--ql-input-foreground);
   border-radius: var(--ql-input-radius);
-  transition: var(--ql-input-transition);
+  border: 1px solid transparent;
+  transition: var(--ql-suggestion-transition);
   font-size: var(--ql-input-font-size-sm);
   line-height: var(--ql-input-line-height);
 }
 
-.ql-suggestion-item:hover,
-.ql-suggestion-item.ql-suggestion-item--selected {
-  background-color: var(--ql-input-muted);
+.ql-suggestion-item:hover {
+  background-color: var(--ql-suggestion-hover);
 }
+
+.ql-suggestion-item.ql-suggestion-item--selected {
+  background-color: var(--ql-suggestion-hover);
+  border: 1px solid var(--ql-suggestion-selected-border);
+}
+
 
 .ql-suggestion-item.ql-suggestion-item--disabled {
   opacity: 0.5;

@@ -81,6 +81,24 @@ const QLInput = React.forwardRef<HTMLInputElement, QLInputProps>(
       setIsOpen(state.showSuggestions && state.suggestions.length > 0);
     }, [state.showSuggestions, state.suggestions.length]);
 
+    // Scroll selected suggestion into view when keyboard navigating
+    React.useEffect(() => {
+      if (state.selectedSuggestionIndex >= 0 && suggestionsRef.current) {
+        const selectedElement = suggestionsRef.current.querySelector(
+          `[data-suggestion-index="${state.selectedSuggestionIndex}"]`
+        ) as HTMLElement;
+        
+        if (selectedElement) {
+          // Smooth scroll to keep selected item in view
+          selectedElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'nearest'
+          });
+        }
+      }
+    }, [state.selectedSuggestionIndex]);
+
     // Removed groupedSuggestions since we're now showing suggestions in a flat list
 
     // Syntax highlighting disabled to avoid text overlap issues
@@ -169,7 +187,8 @@ const QLInput = React.forwardRef<HTMLInputElement, QLInputProps>(
                       key={`${suggestion.category}-${index}`}
                       onClick={() => handleSuggestionSelect(suggestion)}
                       className={classNames('ql-suggestion-item', isSelected && 'ql-suggestion-item--selected')}
-                      data-testid='suggestion-item'>
+                      data-testid='suggestion-item'
+                      data-suggestion-index={index}>
                       <div className='ql-suggestion-item__content'>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           <span className={classNames('ql-suggestion-type', `ql-suggestion-type--${suggestion.type}`)}>
