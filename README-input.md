@@ -9,6 +9,14 @@ A comprehensive React QL (Query Language) input component with intelligent autoc
 [![React](https://img.shields.io/badge/React-18+-blue.svg)](https://reactjs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+## 🎉 What's New in v1.5.0
+
+✨ **Smart Suggestion Behavior** - Enhanced UX with manual control and `Ctrl+Space` shortcuts  
+🚀 **Smooth & Minimal Design** - Lightning-fast 80ms transitions with beautiful visual states  
+⌨️ **Enhanced Keyboard Navigation** - Auto-scroll to selection with seamless long-list navigation  
+🎯 **Perfect Accessibility** - Unified mouse and keyboard interactions with smooth scrolling  
+🔧 **Parameterized Functions** - Advanced function support with type validation and error handling
+
 ## ✨ Features
 
 ### Core Functionality

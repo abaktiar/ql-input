@@ -6,6 +6,13 @@ A comprehensive Query Language (QL) solution with both a framework-agnostic pars
 
 [![npm version](https://badge.fury.io/js/@abaktiar%2Fql-input.svg)](https://badge.fury.io/js/@abaktiar%2Fql-input)
 
+## 🎉 What's New in v1.5.0
+
+✨ **Smart Suggestion Behavior** - Enhanced UX similar to Jira JQL with manual control and Ctrl+Space shortcuts  
+🚀 **Smooth & Minimal Design** - Lightning-fast 80ms transitions with beautiful visual states  
+⌨️ **Enhanced Keyboard Navigation** - Auto-scroll to selection with seamless long-list navigation  
+🎯 **Perfect Accessibility** - Unified mouse and keyboard interactions with smooth scrolling
+
 ## 📦 Dual Package Architecture
 
 This repository provides two complementary packages:

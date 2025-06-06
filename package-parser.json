@@ -1,6 +1,6 @@
 {
   "name": "@abaktiar/ql-parser",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Framework-agnostic QL (Query Language) parser and builder for creating complex queries with support for logical operators, parameterized functions, and ORDER BY clauses",
   "main": "./index.js",
   "module": "./index.mjs",

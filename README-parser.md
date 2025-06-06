@@ -8,6 +8,13 @@ A powerful, framework-agnostic QL (Query Language) parser and builder for creati
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+## 🎉 What's New in v1.5.0
+
+🔧 **Enhanced Function System** - Comprehensive parameterized function support with type validation  
+🧮 **Improved Expression Trees** - Better parsing for complex nested expressions and function calls  
+🎯 **Parameter Validation** - Robust validation for function parameters with descriptive error messages  
+📝 **Extended Documentation** - Comprehensive examples and migration guides for parameterized functions
+
 ## ✨ Features
 
 - 🔍 **Complete Query Parsing** - Parse complex QL queries into structured AST

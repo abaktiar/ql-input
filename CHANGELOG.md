@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Placeholder for future features
+
+## [1.5.0] - 2025-06-06
+
+### Added
 - **Smart Suggestion Behavior**: Enhanced UX similar to Jira JQL
   - **Manual Control**: Suggestions no longer appear automatically after selection
   - **Space-triggered**: Suggestions appear only when you type a space or use keyboard shortcut
