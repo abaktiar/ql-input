@@ -199,4 +199,5 @@ export interface QLInputState {
   query: QLQuery;
   validationErrors: ValidationError[];
   isLoading: boolean;
+  justSelectedSuggestion: boolean;
 }

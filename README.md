@@ -202,6 +202,25 @@ summary ~ "bug" AND status != Done
 | `Enter` | Select highlighted suggestion or execute query |
 | `Tab` | Accept current suggestion |
 | `Esc` | Close suggestions dropdown |
+| `Ctrl+Space` | **NEW:** Manually trigger suggestions |
+
+## 🎯 Smart Suggestion Behavior
+
+The QL Input now features **intelligent suggestion behavior** similar to Jira JQL:
+
+### Enhanced UX Features
+- **🚫 No Automatic Spaces**: Selecting suggestions no longer adds automatic spaces
+- **⏸️ Controlled Display**: Suggestions appear only when you type a space or use `Ctrl+Space`
+- **🎮 Manual Trigger**: Press `Ctrl+Space` anytime to show relevant suggestions
+- **🎯 Less Intrusive**: Focus on building queries without suggestion overwhelm
+
+### Behavior Flow
+1. **Type & Select**: Type "pro" → select "project" → *no suggestions appear*
+2. **Add Space**: Type a space → operator suggestions appear
+3. **Manual Trigger**: Press `Ctrl+Space` anytime → context-appropriate suggestions show
+4. **Continue Building**: Repeat the process for complex queries
+
+This creates a more controlled and pleasant query-building experience!
 
 ## 🔧 Configuration
 

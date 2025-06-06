@@ -26,7 +26,7 @@ export class QLSuggestionEngine {
       suggestions.push(...this.getOperatorSuggestions(context.lastField));
     } else if (context.expectingValue && context.lastField) {
       if (context.inInList) {
-        suggestions.push(...this.getInListValueSuggestions(context.lastField, partialInput));
+        suggestions.push(...this.getInListValueSuggestions(context.lastField));
       } else {
         suggestions.push(...this.getValueSuggestions(context.lastField));
       }
@@ -93,9 +93,9 @@ export class QLSuggestionEngine {
     if (!field) return [];
 
     return field.operators.map((operator) => {
-      // For IN and NOT IN operators, add opening parenthesis
+      // For IN and NOT IN operators, add opening parenthesis (but no trailing space)
       const isListOperator = operator === 'IN' || operator === 'NOT IN';
-      const insertText = isListOperator ? `${operator} (` : `${operator} `;
+      const insertText = isListOperator ? `${operator} (` : operator;
 
       return {
         type: 'operator' as const,
@@ -276,7 +276,7 @@ export class QLSuggestionEngine {
   /**
    * Get value suggestions for IN lists (inside parentheses)
    */
-  private getInListValueSuggestions(fieldName: string, _partialInput: string): QLSuggestion[] {
+  private getInListValueSuggestions(fieldName: string): QLSuggestion[] {
     const field = this.config.fields.find((f) => f.name === fieldName);
     if (!field) return [];
 

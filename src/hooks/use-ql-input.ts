@@ -30,6 +30,7 @@ export function useQLInput({
     query: { raw: initialValue, valid: true, errors: [] },
     validationErrors: [],
     isLoading: false,
+    justSelectedSuggestion: false,
   });
 
   const parser = useRef(new QLParser(config));
@@ -114,17 +115,36 @@ export function useQLInput({
   // Handle input change
   const handleInputChange = useCallback(
     (value: string, cursorPosition: number) => {
+      const currentState = state;
+      const prevValue = currentState.value;
+      const lastCharTyped = value.length > prevValue.length ? value[value.length - 1] : '';
+
+      // Check if we should show suggestions after typing a space
+      const shouldShowSuggestions = !currentState.justSelectedSuggestion || lastCharTyped === ' ';
+
       setState((prev) => ({
         ...prev,
         value,
         cursorPosition,
+        justSelectedSuggestion: prev.justSelectedSuggestion && lastCharTyped !== ' ', // Clear flag when space is typed
       }));
 
       updateQuery(value);
-      // Update suggestions immediately for better responsiveness
-      updateSuggestions(value, cursorPosition);
+
+      // Only update suggestions if we should show them
+      if (shouldShowSuggestions) {
+        updateSuggestions(value, cursorPosition);
+      } else {
+        // Hide suggestions if we shouldn't show them
+        setState((prev) => ({
+          ...prev,
+          showSuggestions: false,
+          suggestions: [],
+          selectedSuggestionIndex: 0,
+        }));
+      }
     },
-    [updateQuery, updateSuggestions]
+    [state, updateQuery, updateSuggestions]
   );
 
   // Handle suggestion selection
@@ -138,18 +158,6 @@ export function useQLInput({
       let newValue: string;
       let newCursorPosition: number;
 
-      // Determine if we should add a space after the suggestion
-      const shouldAddSpace = (suggestion: QLSuggestion): boolean => {
-        // Don't add space for certain types that already include spacing or punctuation
-        if (suggestion.insertText) {
-          // If insertText is provided, use it as-is (it might already include spacing)
-          return false;
-        }
-
-        // Add space for most suggestion types except punctuation
-        return !['parenthesis', 'comma'].includes(suggestion.type);
-      };
-
       if (currentToken && currentToken.type !== 'whitespace') {
         // Special case: if we're on a parenthesis or comma in an IN list, insert after it instead of replacing
         const isInListPunctuation =
@@ -159,12 +167,7 @@ export function useQLInput({
           // Insert after the punctuation token
           const before = value.slice(0, currentToken.end);
           const after = value.slice(currentToken.end);
-          let insertText = suggestion.insertText || suggestion.value;
-
-          // Add space if needed and there's no space already after
-          if (shouldAddSpace(suggestion) && !after.startsWith(' ')) {
-            insertText += ' ';
-          }
+          const insertText = suggestion.insertText || suggestion.value;
 
           newValue = before + insertText + after;
           newCursorPosition = currentToken.end + insertText.length;
@@ -172,12 +175,7 @@ export function useQLInput({
           // Replace the current token
           const before = value.slice(0, currentToken.start);
           const after = value.slice(currentToken.end);
-          let insertText = suggestion.insertText || suggestion.value;
-
-          // Add space if needed and there's no space already after
-          if (shouldAddSpace(suggestion) && !after.startsWith(' ')) {
-            insertText += ' ';
-          }
+          const insertText = suggestion.insertText || suggestion.value;
 
           newValue = before + insertText + after;
           newCursorPosition = currentToken.start + insertText.length;
@@ -186,12 +184,7 @@ export function useQLInput({
         // Insert at cursor position
         const before = value.slice(0, cursorPosition);
         const after = value.slice(cursorPosition);
-        let insertText = suggestion.insertText || suggestion.value;
-
-        // Add space if needed and there's no space already after
-        if (shouldAddSpace(suggestion) && !after.startsWith(' ')) {
-          insertText += ' ';
-        }
+        const insertText = suggestion.insertText || suggestion.value;
 
         newValue = before + insertText + after;
         newCursorPosition = cursorPosition + insertText.length;
@@ -203,6 +196,7 @@ export function useQLInput({
         cursorPosition: newCursorPosition,
         showSuggestions: false,
         selectedSuggestionIndex: 0,
+        justSelectedSuggestion: true, // Flag to prevent immediate suggestions
       }));
 
       updateQuery(newValue);
@@ -213,6 +207,18 @@ export function useQLInput({
   // Handle keyboard navigation
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
+      // Handle Ctrl+Space to manually trigger suggestions
+      if (event.ctrlKey && event.key === ' ') {
+        event.preventDefault();
+        // Force show suggestions and clear the justSelectedSuggestion flag
+        setState((prev) => ({
+          ...prev,
+          justSelectedSuggestion: false,
+        }));
+        updateSuggestions(state.value, state.cursorPosition);
+        return;
+      }
+
       if (!state.showSuggestions) {
         if (event.key === 'Enter') {
           onExecute?.(state.query);
@@ -262,7 +268,17 @@ export function useQLInput({
           break;
       }
     },
-    [state.showSuggestions, state.suggestions, state.selectedSuggestionIndex, state.query, onExecute, selectSuggestion]
+    [
+      state.showSuggestions,
+      state.suggestions,
+      state.selectedSuggestionIndex,
+      state.query,
+      state.value,
+      state.cursorPosition,
+      onExecute,
+      selectSuggestion,
+      updateSuggestions,
+    ]
   );
 
   // Hide suggestions when clicking outside

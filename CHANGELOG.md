@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Smart Suggestion Behavior**: Enhanced UX similar to Jira JQL
+  - **Manual Control**: Suggestions no longer appear automatically after selection
+  - **Space-triggered**: Suggestions appear only when you type a space or use keyboard shortcut
+  - **Ctrl+Space Shortcut**: New keyboard shortcut to manually trigger suggestions anytime
+  - **No Auto-spacing**: Selecting suggestions no longer adds automatic spaces
+  - **Less Intrusive**: More controlled query-building experience without overwhelming suggestions
+  - **State Management**: Added `justSelectedSuggestion` flag to track suggestion selection state
+
 - **Parameterized Functions Support**: Enhanced function system with parameter support
   - Functions can now accept parameters: `daysAgo(30)`, `userInRole("admin")`, `dateRange("start", "end")`
   - Parameter type validation (text, number, date, boolean)

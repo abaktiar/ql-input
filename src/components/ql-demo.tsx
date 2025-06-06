@@ -514,9 +514,58 @@ export function QLDemo() {
                 • <kbd className='demo-kbd'>Esc</kbd> Close suggestions
               </li>
               <li className='demo-feature-item'>
+                • <kbd className='demo-kbd'>Ctrl+Space</kbd> Trigger suggestions
+              </li>
+              <li className='demo-feature-item'>
                 • <kbd className='demo-kbd'>Enter</kbd> Execute query (no suggestions)
               </li>
             </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* New Suggestion Behavior Documentation */}
+      <div className='demo-section'>
+        <h3 className='demo-features-title'>🎯 Smart Suggestion Behavior</h3>
+        <div className='demo-output-card demo-output-card--blue'>
+          <div className='demo-output-description demo-output-description--blue'>
+            <p>
+              <strong>Enhanced UX:</strong> Suggestions now behave more intelligently to avoid overwhelming you!
+            </p>
+
+            <div className='demo-grid demo-grid--2' style={{ marginTop: '1rem' }}>
+              <div>
+                <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--demo-text-primary)' }}>✨ What's New:</h4>
+                <ul style={{ margin: 0, paddingLeft: '1.2rem' }}>
+                  <li>
+                    <strong>No automatic spaces:</strong> Selecting a suggestion doesn't add a space anymore
+                  </li>
+                  <li>
+                    <strong>Manual control:</strong> Suggestions only appear after you type a space
+                  </li>
+                  <li>
+                    <strong>Ctrl+Space shortcut:</strong> Instantly trigger suggestions anytime
+                  </li>
+                  <li>
+                    <strong>Less intrusive:</strong> Focus on building your query without distractions
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--demo-text-primary)' }}>🎮 Try It:</h4>
+                <ol style={{ margin: 0, paddingLeft: '1.2rem' }}>
+                  <li>
+                    Type "pro" → select "project" → <em>no suggestions appear</em>
+                  </li>
+                  <li>Type a space → suggestions for operators appear</li>
+                  <li>
+                    Or press <kbd className='demo-kbd'>Ctrl+Space</kbd> anytime to see suggestions
+                  </li>
+                  <li>Continue building your query step by step!</li>
+                </ol>
+              </div>
+            </div>
           </div>
         </div>
       </div>
